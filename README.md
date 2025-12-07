@@ -29,3 +29,15 @@ Follow App Configuration Quick Start Guide
 - Read config from app config resource
 - Refresh on app configuration value changes
 - Support feature flags
+
+
+# Learned
+To login into ACR and push an image:
+``` bash
+az acr login -n myacr.azurecr.io
+```
+
+To deploy your IaC into Azure: 
+``` sh
+az deployment group create -g rg --template-file ./infra/infra.bicep
+```
