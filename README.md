@@ -49,3 +49,5 @@ You need to define a service principal in Entra for github. When you do that azu
 az ad sp create-for-rbac --name myspname --json-auth
 ```
 The content of this command can be saved in a secret called `AZURE_CREDENTIALS` in github secrets and be used.
+
+This service principal might not have enough permissions to do things (role assignments). You need to give it proper access for that. 
