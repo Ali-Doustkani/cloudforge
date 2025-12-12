@@ -37,7 +37,7 @@ jobs:
           echo url = $url
 
           echo "Importing nginx into ACR"
-          az acr import --name $acrName --source docker.io/library/nginx:latest --image nginx:latest
+          az acr import --name $acrName --source docker.io/library/nginx:1.29.4 --image nginx:testversion
           
           echo "Restarting App Service"
           az webapp restart --name $appServiceName --resource-group $group
