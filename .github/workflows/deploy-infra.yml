@@ -43,4 +43,15 @@ jobs:
           az webapp restart --name $appServiceName --resource-group $group
 
           echo "Testing"
-          curl -i $url
+          httpcode=$(curl -i $url | head -n 1)
+          if [[ "$httpcode" == *"200 OK"* ]]; then
+            echo "PASSED -- 200OK"
+          else 
+            echo "Expected 200OK but received $httpcode"
+            exit 1
+          fi
+          welcome=$(curl $url | grep "Welcome to nginx")
+          if [[ -z "$welcome" ]]; then
+            echo "Expected website content"
+            exit 1
+          fi
