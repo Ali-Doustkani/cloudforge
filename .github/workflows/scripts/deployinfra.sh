@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-$version="$1"
-$groupName="$2"
+version="$1"
+groupName="$2"
 
 echo "Deploying in resource group '$groupName'"
 az group create --name $groupName --location austriaeast --tag version=$version
