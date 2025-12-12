@@ -1,7 +1,7 @@
 name: Deploy Infra
 
 env:
-  SHA: ${{ github.sha.substr(0, 7) }}
+  SHA: ${{ github.sha }}
 
 run-name: ${{ env.SHA }}
 
