@@ -1,5 +1,6 @@
 var acrname = 'alido${resourceGroup().name}acr'
 var appname = 'alido${resourceGroup().name}app'
+var configname = 'alido${resourceGroup().name}config'
 
 resource plan 'Microsoft.Web/serverfarms@2023-12-01' = {
   name: 'linux'
@@ -45,5 +46,23 @@ resource acrPullAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' 
   }
 }
 
+resource appconfig 'Microsoft.AppConfiguration/configurationStores@2025-06-01-preview' ={
+  name: configname
+  location: resourceGroup().location
+  sku: {
+    name: 'Developer'
+  }
+}
+
+resource configDataReaderAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(appconfig.id, app.id, 'datareader')
+  scope: appconfig
+  properties: {
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '516239f1-63e1-4d78-a4de-a74fb236a071')
+    principalId: app.identity.principalId
+  }
+}
+
 output acrName string = acrname
 output appServiceName string = app.name
+output appConfigName string = appconfig.name
