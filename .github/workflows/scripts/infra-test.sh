@@ -10,8 +10,8 @@ appServiceName=$(jq --raw-output ".appServiceName.value" $bicepOutputPath)
 url="https://${appServiceName}.azurewebsites.net"
 echo "Testing app '$url'"
 
-echo "Importing nginx into registry '$acrName'"
-az acr import --name $acrName --source docker.io/library/nginx:1.29.4 --image nginx:testversion
+echo "Importing test image into registry '$acrName'"
+az acr import --name $acrName --source docker.io/library/alidoustkani/testversion:6 --image nginx:testversion
 
 echo "Restarting app '$appServiceName'"
 az webapp restart --name $appServiceName --resource-group $groupName
@@ -24,7 +24,7 @@ else
 echo "Expected 200OK but received $httpcode"
 exit 1
 fi
-welcome=$(curl --connect-timeout $timeout $url | grep "Welcome to nginx")
+welcome=$(curl --connect-timeout $timeout $url | grep "HTTP OK")
 if [[ -z "$welcome" ]]; then
 echo "Expected website content"
 exit 1
