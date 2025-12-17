@@ -18,4 +18,4 @@ jobs:
         with:
           context: ./infra
           push: true
-          tags: ghcr.io/infratest:latest
+          tags: ghcr.io/Ali-Doustkani/infratest:latest
