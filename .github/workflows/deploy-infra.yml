@@ -13,8 +13,10 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: azure/login@v2
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Azure Login
+        uses: azure/login@v2
         with: 
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       - name: Deploy Resources
