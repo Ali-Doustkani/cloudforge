@@ -23,4 +23,6 @@ jobs:
         with:
           context: ./infra
           push: true
-          tags: ghcr.io/ali-doustkani/infratest:latest
+          tags: |
+            ghcr.io/ali-doustkani/infratest:latest
+            ghcr.io/ali-doustkani/infratest:${{ github.sha }}
