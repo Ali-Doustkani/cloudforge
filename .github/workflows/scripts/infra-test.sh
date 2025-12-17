@@ -15,6 +15,5 @@ echo "Restarting app '$appServiceName'"
 az webapp restart --name $appServiceName --resource-group $groupName
 
 source ./.github/workflows/scripts/infra-test-webapp.sh
-source ./.github/workflows/scripts/infra-test-appconfig.sh
 
 test_webapp $appServiceName
