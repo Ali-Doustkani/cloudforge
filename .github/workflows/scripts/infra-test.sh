@@ -13,7 +13,3 @@ az acr import --name $acrName --source ghcr.io/ali-doustkani/testapp:latest --im
 
 echo "Restarting app '$appServiceName'"
 az webapp restart --name $appServiceName --resource-group $groupName
-
-source ./.github/workflows/scripts/infra-test-webapp.sh
-
-test_webapp $appServiceName

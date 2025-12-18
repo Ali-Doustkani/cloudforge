@@ -20,8 +20,7 @@ jobs:
         with: 
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       - name: Deploy Resources
+        id: deploy
         run: ./.github/workflows/scripts/infra-deploy.sh ${{ github.sha }} ${{ github.event.inputs.groupName }}
-      # - name: Test
-      #   run: ./.github/workflows/scripts/infra-test.sh ${{ github.event.inputs.groupName }} "./outputs.json"
       - name: Test
-        run: python ./infra/tests/tests.py
+        run: python ./infra/tests/tests.py ${{ steps.deploy.outputs.appServiceName }}
