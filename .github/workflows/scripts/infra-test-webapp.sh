@@ -17,4 +17,7 @@ test_webapp(){
     echo "Expected website content"
     exit 1
     fi
+    
+
+    # verify for appconfig access here
 }
