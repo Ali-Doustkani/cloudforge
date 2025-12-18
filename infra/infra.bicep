@@ -54,6 +54,15 @@ resource appconfig 'Microsoft.AppConfiguration/configurationStores@2025-06-01-pr
   }
 }
 
+resource defaultConfig 'Microsoft.AppConfiguration/configurationStores/keyValues@2025-06-01-preview' = {
+  parent: appconfig
+  name: 'infra_default'
+  properties:{
+    value: 'infra_value'
+    contentType: 'text/plain'
+  }
+}
+
 resource configDataReaderAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(appconfig.id, app.id, 'datareader')
   scope: appconfig
