@@ -21,4 +21,4 @@ echo "Restarting app '$appServiceName'"
 az webapp restart --name $appServiceName --resource-group $groupName
 
 # save into github variables
-echo "appServiceName=$appServiceName" >> $GITHUB_OUTPUT
+echo "url=https://{$appServiceName}.azurewebsites.net" >> $GITHUB_OUTPUT

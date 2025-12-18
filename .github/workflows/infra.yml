@@ -23,4 +23,4 @@ jobs:
         id: deploy
         run: ./.github/workflows/scripts/infra-deploy.sh ${{ github.sha }} ${{ github.event.inputs.groupName }}
       - name: Test
-        run: python ./infra/tests/tests.py ${{ steps.deploy.outputs.appServiceName }}
+        run: python ./infra/tests/tests.py ${{ steps.deploy.outputs.url }}
