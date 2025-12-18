@@ -2,15 +2,18 @@ using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var appConfigEndpoint = Environment.GetEnvironmentVariable("APP_CONFIG_ENDPOINT");
+var appConfigEndpoint = builder.Configuration["APP_CONFIG_ENDPOINT"];
 
-builder.Configuration.AddAzureAppConfiguration(options =>
+if (appConfigEndpoint != null)
 {
-    options.Connect(
-        new Uri($"https://{appConfigEndpoint}.azconfig.io"),
-        new DefaultAzureCredential())
-    .Select("*");
-});
+    builder.Configuration.AddAzureAppConfiguration(options =>
+    {
+        options.Connect(
+            new Uri($"https://{appConfigEndpoint}.azconfig.io"),
+            new DefaultAzureCredential())
+        .Select("*");
+    });
+}
 
 var app = builder.Build();
 
