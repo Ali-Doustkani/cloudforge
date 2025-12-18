@@ -22,6 +22,12 @@ resource app 'Microsoft.Web/sites@2025-03-01' = {
     siteConfig: {
       linuxFxVersion: 'DOCKER|${acrname}.azurecr.io/testapp:testversion' // this is refering to container registry
       acrUseManagedIdentityCreds: true // this means the web app should use system assigned identity for authentication. An AcrPull role is assigned automatically in ACR with this.
+      appSettings: [
+        {
+          name: 'APP_CONFIG_ENDPOINT'
+          value: appconfig.properties.endpoint
+        }
+      ]
     }
   }
   identity: {
