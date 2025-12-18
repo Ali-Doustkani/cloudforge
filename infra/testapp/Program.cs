@@ -4,7 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var appConfigEndpoint = builder.Configuration["APP_CONFIG_ENDPOINT"];
 
-if (appConfigEndpoint != null)
+if (!string.IsNullOrEmpty(appConfigEndpoint))
 {
     builder.Configuration.AddAzureAppConfiguration(options =>
     {
