@@ -25,7 +25,7 @@ resource app 'Microsoft.Web/sites@2025-03-01' = {
       appSettings: [
         {
           name: 'APP_CONFIG_ENDPOINT'
-          value: 'https://${configname}.azconfig.io'
+          value: appconfig.properties.endpoint // 'https://${configname}.azconfig.io'
         }
       ]
     }
