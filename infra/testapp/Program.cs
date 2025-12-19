@@ -58,7 +58,7 @@ string CheckKeyVault()
     {
         var uri = new Uri(keyVaultEndpoint);
         var client = new SecretClient(uri, new DefaultAzureCredential());
-        return client.GetSecret("infra_default").Value.Value;
+        return client.GetSecret("infra-default").Value.Value;
     }
     catch (Exception ex)
     {
