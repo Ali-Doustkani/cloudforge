@@ -96,7 +96,7 @@ resource kv 'Microsoft.KeyVault/vaults@2025-05-01' = {
     }
     enableRbacAuthorization: true
     softDeleteRetentionInDays: 7
-    enablePurgeProtection: false
+    enablePurgeProtection: true
   }
 }
 
