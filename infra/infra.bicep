@@ -28,6 +28,10 @@ resource app 'Microsoft.Web/sites@2025-03-01' = {
           name: 'APP_CONFIG_ENDPOINT'
           value: appconfig.properties.endpoint
         }
+        {
+          name: 'KV_ENDPOINT'
+          value: kv.properties.vaultUri
+        }
       ]
     }
   }
@@ -97,6 +101,15 @@ resource kv 'Microsoft.KeyVault/vaults@2025-05-01' = {
     enableRbacAuthorization: true
     softDeleteRetentionInDays: 7
     enablePurgeProtection: true
+  }
+}
+
+resource defaultkv 'Microsoft.KeyVault/vaults/secrets@2025-05-01' = {
+  parent: kv
+  name: 'infra_default'
+  properties: {
+    value: 'infra_value'
+    contentType: 'text/plain'
   }
 }
 
