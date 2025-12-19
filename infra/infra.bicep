@@ -57,6 +57,7 @@ resource acrPullAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' 
       '7f951dda-4ed3-4680-a7ca-43fe172d538d'
     )
     principalId: app.identity.principalId
+    principalType: 'ServicePrincipal'
   }
 }
 
@@ -86,6 +87,7 @@ resource configDataReaderAssignment 'Microsoft.Authorization/roleAssignments@202
       '516239f1-63e1-4d78-a4de-a74fb236a071'
     )
     principalId: app.identity.principalId
+    principalType: 'ServicePrincipal'
   }
 }
 
