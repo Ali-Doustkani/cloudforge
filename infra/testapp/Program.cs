@@ -1,3 +1,4 @@
+using Azure;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 
@@ -25,6 +26,7 @@ app.MapGet("/", () =>
         "HTTP OK",
          $"App Config: {CheckAppConfig()}",
          $"Key Vault: {CheckKeyVault()}",
+         $"Set Secret: {CheckSecretSet()}",
          ];
     return string.Join(Environment.NewLine, ret);
 });
@@ -63,5 +65,29 @@ string CheckKeyVault()
     catch (Exception ex)
     {
         return ex.Message;
+    }
+}
+
+string CheckSecretSet()
+{
+    try
+    {
+        var uri = new Uri(keyVaultEndpoint);
+        var client = new SecretClient(uri, new DefaultAzureCredential());
+        client.SetSecret(new KeyVaultSecret("test", "test"));
+        return "successful";
+    }
+    catch (RequestFailedException ex)
+    {
+        if (ex.Status == 403)
+        {
+            return "denied";
+        }
+
+        return $"failed with {ex.Status}";
+    }
+    catch (Exception ex)
+    {
+        return $"failed with unexpected error ({ex.Message})";
     }
 }
