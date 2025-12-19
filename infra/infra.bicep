@@ -1,6 +1,7 @@
 var acrname = 'alido${resourceGroup().name}acr'
 var appname = 'alido${resourceGroup().name}app'
 var configname = 'alido${resourceGroup().name}config'
+var kvname = 'alido${resourceGroup().name}kv'
 
 resource plan 'Microsoft.Web/serverfarms@2023-12-01' = {
   name: 'linux'
@@ -79,6 +80,33 @@ resource configDataReaderAssignment 'Microsoft.Authorization/roleAssignments@202
     roleDefinitionId: subscriptionResourceId(
       'Microsoft.Authorization/roleDefinitions',
       '516239f1-63e1-4d78-a4de-a74fb236a071'
+    )
+    principalId: app.identity.principalId
+  }
+}
+
+resource kv 'Microsoft.KeyVault/vaults@2025-05-01' = {
+  name: kvname
+  location: resourceGroup().location
+  properties: {
+    tenantId: tenant().tenantId
+    sku: {
+      family: 'A'
+      name: 'standard'
+    }
+    enableRbacAuthorization: true
+    softDeleteRetentionInDays: 7
+    enablePurgeProtection: false
+  }
+}
+
+resource secretReaderAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(kv.id, app.id, 'secretreader')
+  scope: kv
+  properties: {
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      '4633458b-17de-408a-b874-0445c86b69e6'
     )
     principalId: app.identity.principalId
   }
