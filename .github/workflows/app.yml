@@ -17,6 +17,8 @@ jobs:
       - name: ACR Login
         run: az acr login --name alidotestacr-cdhre2gdg0c2hjam.azurecr.io
       - name: Build and push image
-        run: |
-          docker build -t alidotestacr-cdhre2gdg0c2hjam.azurecr.io/myapp:${{ github.sha }} .
-          docker push alidotestacr-cdhre2gdg0c2hjam.azurecr.io/myapp:${{ github.sha }}
+        uses: docker/build-push-action@v5
+        with:
+          context: ./src
+          push: true
+          tags: alidotestacr-cdhre2gdg0c2hjam.azurecr.io/myapp:${{ github.sha }}
