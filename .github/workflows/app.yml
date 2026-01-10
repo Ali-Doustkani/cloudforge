@@ -1,0 +1,8 @@
+name: App
+run-name: ${{ github.sha }}
+on: 
+  push:
+  workflow_dispatch:
+
+jobs:
+  
