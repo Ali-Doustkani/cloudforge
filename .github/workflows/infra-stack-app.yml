@@ -1,4 +1,4 @@
-name: Stack App
+name: Infra Stack App
 
 run-name: ${{ github.sha }}
 

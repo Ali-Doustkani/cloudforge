@@ -20,4 +20,4 @@ jobs:
         with: 
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       - name: Deploy Platform Stack
-        run: ./.github/workflows/scripts/platform-deploy.sh ${{ github.sha }} ${{ github.event.inputs.groupName }}
+        run: ./.github/workflows/scripts/infra-stack-platform.sh ${{ github.sha }} ${{ github.event.inputs.groupName }}
