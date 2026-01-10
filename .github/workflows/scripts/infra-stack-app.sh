@@ -8,7 +8,7 @@ echo "Deploying in resource group '$groupName'"
 az group create --name $groupName --location austriaeast --tag version=$version
 az deployment group create \
 --resource-group $groupName \
---template-file infra/infra.bicep \
+--template-file infra/app-stack.bicep \
 --query "properties.outputs" \
 --output json > outputs.json
 
