@@ -19,7 +19,7 @@ jobs:
         uses: azure/login@v2
         with: 
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - name: Deploy Platform Stack
+      - name: Deploy App Stack
         id: deploy
         run: ./.github/workflows/scripts/infra-stack-app.sh ${{ github.sha }} ${{ github.event.inputs.groupName }}
       - name: Test
