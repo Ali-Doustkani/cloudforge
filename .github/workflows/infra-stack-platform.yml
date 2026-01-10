@@ -4,10 +4,6 @@ run-name: ${{ github.sha }}
 
 on:
   workflow_dispatch:
-    inputs:
-      groupName: 
-        description: "Resource Group Name"
-        default: "platform"
 
 jobs:
   deploy:
@@ -20,4 +16,4 @@ jobs:
         with: 
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       - name: Deploy Platform Stack
-        run: ./.github/workflows/scripts/infra-stack-platform.sh ${{ github.sha }} ${{ github.event.inputs.groupName }}
+        run: ./.github/workflows/scripts/infra-stack-platform.sh ${{ github.sha }} platform

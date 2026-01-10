@@ -15,7 +15,7 @@ jobs:
         with: 
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       - name: ACR Login
-        run: az acr login --name alidotestacr-cdhre2gdg0c2hjam.azurecr.io
+        run: az acr login --name alidoplatformacr.azurecr.io
       - name: Build and push image
         uses: docker/build-push-action@v5
         with:
