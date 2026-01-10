@@ -22,8 +22,8 @@ jobs:
       - name: Build and push image
         uses: docker/build-push-action@v5
         with:
-          context: ./infra/testapp
+          context: ./infra/testfixture
           push: true
           tags: |
-            ghcr.io/ali-doustkani/testapp:latest
-            ghcr.io/ali-doustkani/testapp:${{ github.sha }}
+            ghcr.io/ali-doustkani/testfixture:latest
+            ghcr.io/ali-doustkani/testfixture:${{ github.sha }}
