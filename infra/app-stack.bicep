@@ -1,5 +1,5 @@
-param acrrg string
-param acrname string
+param acrRg string
+param acrName string
 
 var appname = 'alido${resourceGroup().name}app'
 var configname = 'alido${resourceGroup().name}config'
@@ -102,14 +102,14 @@ resource secretReaderAssignment 'Microsoft.Authorization/roleAssignments@2022-04
 
 module acrRbac './app-stack-rbac.bicep' = {
   name: 'acr-rbac22'
-  scope: resourceGroup(acrrg) // the scope 
+  scope: resourceGroup(acrRg) // the scope 
   params: {
     appId: app.id
-    acrName: acrname
+    acrName: acrName
     principalId: app.identity.principalId
   }
 }
 
-output acrName string = acrname
+output acrName string = acrName
 output appServiceName string = app.name
 output keyVaultName string = kvname
