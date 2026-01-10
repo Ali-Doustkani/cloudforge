@@ -14,9 +14,10 @@ az deployment group create \
 
 # assign secret officer to pipeline service principal to set test secret
 keyVaultName=$(jq --raw-output ".keyVaultName.value" outputs.json)
-pipelineObjectId="2aa460f0-b63a-465d-8d73-a2662efc80e2"
+githubServicePrincipalObjId="2aa460f0-b63a-465d-8d73-a2662efc80e2"
+echo "Assigning secret officer role of $keyVaultName to github service principal"
 az role assignment create \
-  --assignee-object-id "$pipelineObjectId" \
+  --assignee-object-id "$githubServicePrincipalObjId" \
   --assignee-principal-type ServicePrincipal \
   --role "Key Vault Secrets Officer" \
   --scope "/subscriptions/$(az account show --query id -o tsv)/resourceGroups/$groupName/providers/Microsoft.KeyVault/vaults/$keyVaultName"
