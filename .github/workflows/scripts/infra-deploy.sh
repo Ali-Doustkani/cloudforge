@@ -31,8 +31,14 @@ echo "Restarting app '$appServiceName'"
 az webapp restart --name $appServiceName --resource-group $groupName
 
 # set secret for testing
-echo "Setting secret for testing"
-az keyvault secret set --name infra-default --value infra_value --vault-name $keyVaultName
+# it might take some time for the `role assignment create` to be applied
+for i in {1..5}; do
+  echo "Attempt $i: setting secret in $keyVaultName"
+  if az keyvault secret set --name infra-default --value infra_value --vault-name "$keyVaultName"; then
+    break
+  fi
+  sleep 10
+done
 
 # save into github variables
 echo "url=https://$appServiceName.azurewebsites.net" >> $GITHUB_OUTPUT
