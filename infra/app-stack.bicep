@@ -82,7 +82,7 @@ resource kv 'Microsoft.KeyVault/vaults@2025-05-01' = {
       name: 'standard'
     }
     enableRbacAuthorization: true
-    enablePurgeProtection: false // Purge protection is disabled to allow purging a vault as soon as it is deleted
+    enablePurgeProtection: null // Purge protection is disabled to allow purging a vault as soon as it is deleted
   }
 }
 
