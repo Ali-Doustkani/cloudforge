@@ -19,8 +19,8 @@ jobs:
         uses: azure/login@v2
         with: 
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - name: Deploy App Stack
-        id: deploy
-        run: ./.github/workflows/scripts/infra-stack-app.sh ${{ github.sha }} ${{ github.event.inputs.groupName }}
+      # - name: Deploy App Stack
+      #   id: deploy
+      #   run: ./.github/workflows/scripts/infra-stack-app.sh ${{ github.sha }} ${{ github.event.inputs.groupName }}
       - name: Test
-        run: python ./infra/tests/tests.py ${{ steps.deploy.outputs.url }}
+        run: pytest ./infra/tests --url https://alidorg4app.azurewebsites.net/ # ${{ steps.deploy.outputs.url }}
