@@ -19,9 +19,9 @@ jobs:
         uses: azure/login@v2
         with: 
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-      # - name: Deploy App Stack
-      #   id: deploy
-      #   run: ./.github/workflows/scripts/infra-stack-app.sh ${{ github.sha }} ${{ github.event.inputs.groupName }}
+      - name: Deploy App Stack
+        id: deploy
+        run: ./.github/workflows/scripts/infra-stack-app.sh ${{ github.sha }} ${{ github.event.inputs.groupName }}
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
