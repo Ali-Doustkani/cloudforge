@@ -5,6 +5,9 @@ run-name: ${{ github.sha }}
 on:
   workflow_dispatch:
 
+permissions:
+  actions: write
+  
 jobs:
   deploy:
     runs-on: ubuntu-latest
