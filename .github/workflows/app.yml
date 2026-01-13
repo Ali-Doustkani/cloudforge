@@ -24,3 +24,5 @@ jobs:
           tags: |
             alidoplatformacr.azurecr.io/app:latest
             alidoplatformacr.azurecr.io/app:${{ github.sha }}
+      - name: Upgrade App Service
+        run: az webapp config container set --resource-group $RG --name $AS --docker-custom-image-name app:${{ github.sha }}
