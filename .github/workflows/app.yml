@@ -22,5 +22,5 @@ jobs:
           context: ./src
           push: true
           tags: |
-            alidotestacr-cdhre2gdg0c2hjam.azurecr.io/app:latest
-            alidotestacr-cdhre2gdg0c2hjam.azurecr.io/app:${{ github.sha }}
+            alidoplatformacr.azurecr.io/app:latest
+            alidoplatformacr.azurecr.io/app:${{ github.sha }}
