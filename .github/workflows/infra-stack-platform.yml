@@ -15,23 +15,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      # - name: Azure Login
-      #   uses: azure/login@v2
-      #   with: 
-      #     creds: ${{ secrets.AZURE_CREDENTIALS }}
-      # - name: Deploy Platform Stack
-      #   run: ./.github/workflows/scripts/infra-stack-platform.sh ${{ github.sha }} platform
-      - name: Store Config
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.request(
-              'PUT /repositories/{owner}/{repo}/environments/{environment_name}/variables/{name}',
-              {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                environment_name: 'prod',
-                name: 'platform_rg_name',
-                value: 'platform2'
-              }
-            )
+      - name: Azure Login
+        uses: azure/login@v2
+        with: 
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Deploy Platform Stack
+        run: ./.github/workflows/scripts/infra-stack-platform.sh ${{ github.sha }} platform
