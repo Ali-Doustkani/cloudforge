@@ -24,19 +24,13 @@ jobs:
           tags: |
             alidoplatformacr.azurecr.io/app:latest
             alidoplatformacr.azurecr.io/app:${{ github.sha }}
-      - name: Find Resource Group
-        id: find_rg
+      - name: Find Target Resource
         run: |
           RG=$(az group list --tag type=app --query '[0].name' -o tsv)
           echo "Resource Group: $RG"
           echo "RG=$RG" >> $GITHUB_ENV
-
-      - name: Find Web App
-        id: find_webapp
-        run: |
           AS=$(az webapp list --resource-group $RG --query '[0].name' -o tsv)
           echo "Web App Name: $AS"
           echo "AS=$AS" >> $GITHUB_ENV
-
       - name: Upgrade App Service
         run: az webapp config container set --resource-group $RG --name $AS --docker-custom-image-name app:${{ github.sha }}

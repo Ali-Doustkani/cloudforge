@@ -5,7 +5,7 @@ version="$1"
 groupName="$2"
 
 echo "Deploying in resource group '$groupName'"
-az group create --name $groupName --location austriaeast --tag version=$version
+az group create --name $groupName --location austriaeast --tag version=$version --tag type=platform
 az deployment group create \
 --resource-group $groupName \
 --template-file infra/platform-stack.bicep

@@ -5,7 +5,7 @@ version="$1"
 groupName="$2"
 
 echo "Deploying in resource group '$groupName'"
-az group create --name $groupName --location austriaeast --tag version=$version
+az group create --name $groupName --location austriaeast --tag version=$version --tag type=app
 az deployment group create \
 --resource-group $groupName \
 --parameters acrRg=platform acrName=alidoplatformacr \
