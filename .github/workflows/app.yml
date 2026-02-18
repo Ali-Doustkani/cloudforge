@@ -26,11 +26,17 @@ jobs:
             alidoplatformacr.azurecr.io/app:${{ github.sha }}
       - name: Find Target Resource
         run: |
-          RG=$(az group list --tag type=app --query '[0].name' -o tsv)
-          echo "Resource Group: $RG"
-          echo "RG=$RG" >> $GITHUB_ENV
-          AS=$(az webapp list --resource-group $RG --query '[0].name' -o tsv)
-          echo "Web App Name: $AS"
-          echo "AS=$AS" >> $GITHUB_ENV
+          platformResourceGroup=$(az group list --tag type=platform --query '[0].name' -o tsv)
+          echo "Platform Resource Group: $platformResourceGroup"
+          echo "platformResourceGroup=$platformResourceGroup" >> $GITHUB_ENV
+          appResourceGroup=$(az group list --tag type=app --query '[0].name' -o tsv)
+          echo "Resource Group: $appResourceGroup"
+          echo "appResourceGroup=$appResourceGroup" >> $GITHUB_ENV
+          webAppName=$(az webapp list --resource-group $appResourceGroup --query '[0].name' -o tsv)
+          echo "Web App Name: $webAppName"
+          echo "webAppName=$webAppName" >> $GITHUB_ENV
+          acrLoginServer=$(az acr list --resource-group $platformResourceGroup --query '[0].loginServer' -o tsv)
+          echo "ACR Login Server: $acrLoginServer"
+          echo "acrLoginServer=$acrLoginServer" >> $GITHUB_ENV
       - name: Upgrade App Service
-        run: az webapp config container set --resource-group $RG --name $AS --docker-custom-image-name app:${{ github.sha }}
+        run: az webapp config container set --resource-group $appResourceGroup --name $webAppName --container-image-name $acrLoginServer/app:${{ github.sha }}
