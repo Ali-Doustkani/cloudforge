@@ -2,7 +2,7 @@ provider "azurerm" {
   features {}
 }
 
-variable "version" {
+variable "ver" {
   type = string
   description = "version of the infrastructure. git sha."
 }
@@ -16,7 +16,7 @@ resource "azurerm_resource_group" "main" {
   location = "austriaeast"
   tags = {
     type    = "platform"
-    version = var.version
+    version = var.ver
   }
 }
 
