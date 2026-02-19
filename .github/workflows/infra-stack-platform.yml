@@ -16,22 +16,13 @@ jobs:
       run:
         working-directory: infra/terraform
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Azure Login
-        uses: azure/login@v2
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
         with: 
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-      # - name: Deploy Platform Stack
-      #   run: ./.github/workflows/scripts/infra-stack-platform.sh ${{ github.sha }} platform
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-      - name: Terraform Init
-        run: terraform init
-      - name: Terraform Validate
-        run: terraform validate
-      - name: Terraform Plan
-        run: terraform plan -var="ver=${{ github.sha }}" -out=tfplan
-      - name: Terraform Apply
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform init
+      - run: terraform validate
+      - run: terraform plan -var="ver=${{ github.sha }}" -out=tfplan
+      - run: terraform apply -auto-approve tfplan
         if: github.ref == 'refs/heads/main'
-        run: terraform apply -auto-approve tfplan
