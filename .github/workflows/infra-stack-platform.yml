@@ -31,7 +31,7 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
       - name: Terraform Plan
-        run: terraform plan -var="version=${{ github.sha }}" -out=tfplan
+        run: terraform plan -var="ver=${{ github.sha }}" -out=tfplan
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main'
         run: terraform apply -auto-approve tfplan
