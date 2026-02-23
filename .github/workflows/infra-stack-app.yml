@@ -26,7 +26,7 @@ jobs:
       - run: terraform plan -var="ver=${{ github.sha }}" -var="group_name=${{ github.event.inputs.groupName }}" -out=tfplan
       - run: terraform apply -auto-approve tfplan
       - name: Prepare test environment
-        id: post_deploy
+        id: prepare_test_env
         working-directory: ${{ github.workspace }}
         run: |
           # Read terraform outputs
@@ -67,4 +67,4 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pytest ./infra/tests/tests.py --url ${{ steps.post_deploy.outputs.url }} --reruns 5 --reruns-delay 3
+          pytest ./infra/tests/tests.py --url ${{ steps.prepare_test_env.outputs.url }} --reruns 5 --reruns-delay 3
