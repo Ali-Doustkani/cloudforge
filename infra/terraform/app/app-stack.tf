@@ -87,12 +87,12 @@ resource "azurerm_app_configuration" "main" {
 }
 
 resource "azurerm_key_vault" "main" {
-  name                      = local.kv_name
-  location                  = azurerm_resource_group.app.location
-  resource_group_name       = azurerm_resource_group.app.name
-  tenant_id                 = data.azurerm_client_config.current.tenant_id
-  sku_name                  = "standard"
-  enable_rbac_authorization = true
+  name                       = local.kv_name
+  location                   = azurerm_resource_group.app.location
+  resource_group_name        = azurerm_resource_group.app.name
+  tenant_id                  = data.azurerm_client_config.current.tenant_id
+  sku_name                   = "standard"
+  rbac_authorization_enabled = true
 }
 
 resource "azurerm_role_assignment" "app_config_reader" {
