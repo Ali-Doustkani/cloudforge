@@ -22,9 +22,9 @@ variable "group_name" {
 }
 
 locals {
-  sp_name             = "alido${var.group_name}sp"
+  asp_name            = "alido${var.group_name}asp"
   app_name            = "alido${var.group_name}app"
-  config_name         = "alido${var.group_name}config"
+  appcs_name          = "alido${var.group_name}appcs"
   kv_name             = "alido${var.group_name}kv"
   acr_rg              = "platform"
   acr_name            = "alidoplatformacr"
@@ -48,7 +48,7 @@ resource "azurerm_resource_group" "app" {
 }
 
 resource "azurerm_service_plan" "main" {
-  name                = local.sp_name
+  name                = local.asp_name
   location            = azurerm_resource_group.app.location
   resource_group_name = azurerm_resource_group.app.name
   os_type             = "Linux"
@@ -80,7 +80,7 @@ resource "azurerm_linux_web_app" "main" {
 }
 
 resource "azurerm_app_configuration" "main" {
-  name                = local.config_name
+  name                = local.appcs_name
   location            = azurerm_resource_group.app.location
   resource_group_name = azurerm_resource_group.app.name
   sku                 = "free"
