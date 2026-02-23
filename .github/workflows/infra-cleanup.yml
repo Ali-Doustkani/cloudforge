@@ -8,11 +8,13 @@ jobs:
   cleanup:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
       - name: Azure Login
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       - name: Remove All Resources
-        run: ./.github/workflows/scripts/infra-cleanup.sh
+        run: |
+          for rg in $(az group list --query "[].name" -o tsv); do
+              echo "Deleting resource group: $rg"
+              az group delete --name "$rg" --yes
+          done
