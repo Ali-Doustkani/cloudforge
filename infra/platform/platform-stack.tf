@@ -1,7 +1,7 @@
 terraform {
   backend "azurerm" {
     resource_group_name  = "tfstate-rg"
-    storage_account_name = "alidotfstate"
+    storage_account_name = "cftfstate"
     container_name       = "tfstate"
     key                  = "platform.tfstate"
   }
@@ -30,7 +30,7 @@ resource "azurerm_resource_group" "main" {
 }
 
 resource "azurerm_container_registry" "acr" {
-  name                = "alido${azurerm_resource_group.main.name}acr"
+  name                = "cf${azurerm_resource_group.main.name}acr"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 

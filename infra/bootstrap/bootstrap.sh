@@ -2,7 +2,7 @@
 set -euo pipefail
 
 RESOURCE_GROUP="tfstate-rg"
-STORAGE_ACCOUNT="alidotfstate"
+STORAGE_ACCOUNT="cftfstate"
 CONTAINER="tfstate"
 LOCATION="austriaeast"
 

@@ -15,15 +15,15 @@ jobs:
         with: 
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       - name: ACR Login
-        run: az acr login --name alidoplatformacr.azurecr.io
+        run: az acr login --name cfplatformacr.azurecr.io
       - name: Build and push image
         uses: docker/build-push-action@v5
         with:
           context: ./src
           push: true
           tags: |
-            alidoplatformacr.azurecr.io/app:latest
-            alidoplatformacr.azurecr.io/app:${{ github.sha }}
+            cfplatformacr.azurecr.io/app:latest
+            cfplatformacr.azurecr.io/app:${{ github.sha }}
       - name: Find Target Resource
         run: |
           platformResourceGroup=$(az group list --tag type=platform --query '[0].name' -o tsv)

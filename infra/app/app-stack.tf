@@ -1,7 +1,7 @@
 terraform {
   backend "azurerm" {
     resource_group_name  = "tfstate-rg"
-    storage_account_name = "alidotfstate"
+    storage_account_name = "cftfstate"
     container_name       = "tfstate"
     key                  = "app.tfstate"
   }
@@ -22,12 +22,12 @@ variable "group_name" {
 }
 
 locals {
-  asp_name            = "alido${var.group_name}asp"
-  app_name            = "alido${var.group_name}app"
-  appcs_name          = "alido${var.group_name}appcs"
-  kv_name             = "alido${var.group_name}kv"
+  asp_name            = "cf${var.group_name}asp"
+  app_name            = "cf${var.group_name}app"
+  appcs_name          = "cf${var.group_name}appcs"
+  kv_name             = "cf${var.group_name}kv"
   acr_rg              = "platform"
-  acr_name            = "alidoplatformacr"
+  acr_name            = "cfplatformacr"
   github_sp_object_id = "2aa460f0-b63a-465d-8d73-a2662efc80e2"
 }
 
