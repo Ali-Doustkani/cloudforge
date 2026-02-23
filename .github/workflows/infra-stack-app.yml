@@ -1,33 +1,64 @@
 name: Infra Stack App
-
 run-name: ${{ github.sha }}
-
 on:
   workflow_dispatch:
     inputs:
-      groupName: 
+      groupName:
         description: "Resource Group Name"
         default: "rg"
-
+permissions:
+  actions: write
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: dev
+    defaults:
+      run:
+        working-directory: infra/terraform/app
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Azure Login
-        uses: azure/login@v2
-        with: 
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - name: Deploy App Stack
-        id: deploy
-        run: ./.github/workflows/scripts/infra-stack-app.sh ${{ github.sha }} ${{ github.event.inputs.groupName }}
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform init
+      - run: terraform validate
+      - run: terraform plan -var="ver=${{ github.sha }}" -var="group_name=${{ github.event.inputs.groupName }}" -out=tfplan
+      - run: terraform apply -auto-approve tfplan
+      - name: Post-deploy
+        id: post_deploy
+        working-directory: ${{ github.workspace }}
+        run: |
+          group="${{ github.event.inputs.groupName }}"
+          acr_name=$(terraform -chdir=infra/terraform/app output -raw acr_name)
+          app_name=$(terraform -chdir=infra/terraform/app output -raw app_service_name)
+          kv_name=$(terraform -chdir=infra/terraform/app output -raw key_vault_name)
+          config_name=$(terraform -chdir=infra/terraform/app output -raw app_config_name)
+
+          az acr repository show-tags --name $acr_name --repository testapp --query "[?@=='testversion']" -o tsv | grep -q . \
+            || az acr import --name $acr_name --source ghcr.io/ali-doustkani/testapp:latest --image testapp:testversion
+
+          az webapp restart --name $app_name --resource-group $group
+
+          for i in {1..5}; do
+            echo "Attempt $i: setting app config key"
+            if az appconfig kv set --name $config_name --key infra_default --value infra_value --yes; then break; fi
+            sleep 10
+          done
+
+          for i in {1..5}; do
+            echo "Attempt $i: setting secret in $kv_name"
+            if az keyvault secret set --name infra-default --value infra_value --vault-name "$kv_name"; then break; fi
+            sleep 10
+          done
+
+          echo "url=https://$app_name.azurewebsites.net" >> $GITHUB_OUTPUT
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
       - name: Test
+        working-directory: ${{ github.workspace }}
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pytest ./infra/tests/tests.py --url ${{ steps.deploy.outputs.url }} --reruns 5 --reruns-delay 3
+          pytest ./infra/tests/tests.py --url ${{ steps.post_deploy.outputs.url }} --reruns 5 --reruns-delay 3
