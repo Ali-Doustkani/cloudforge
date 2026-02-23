@@ -29,29 +29,35 @@ jobs:
         id: post_deploy
         working-directory: ${{ github.workspace }}
         run: |
+          # Read terraform outputs
           group="${{ github.event.inputs.groupName }}"
           acr_name=$(terraform -chdir=infra/terraform/app output -raw acr_name)
           app_name=$(terraform -chdir=infra/terraform/app output -raw app_service_name)
           kv_name=$(terraform -chdir=infra/terraform/app output -raw key_vault_name)
           config_name=$(terraform -chdir=infra/terraform/app output -raw app_config_name)
 
+          # Import test image into ACR if not already present
           az acr repository show-tags --name $acr_name --repository testapp --query "[?@=='testversion']" -o tsv | grep -q . \
             || az acr import --name $acr_name --source ghcr.io/ali-doustkani/testapp:latest --image testapp:testversion
 
+          # Restart web app
           az webapp restart --name $app_name --resource-group $group
 
+          # Set app configuration key
           for i in {1..5}; do
             echo "Attempt $i: setting app config key"
             if az appconfig kv set --name $config_name --key infra_default --value infra_value --yes; then break; fi
             sleep 10
           done
 
+          # Set key vault secret
           for i in {1..5}; do
             echo "Attempt $i: setting secret in $kv_name"
             if az keyvault secret set --name infra-default --value infra_value --vault-name "$kv_name"; then break; fi
             sleep 10
           done
 
+          # Export app URL
           echo "url=https://$app_name.azurewebsites.net" >> $GITHUB_OUTPUT
       - uses: actions/setup-python@v5
         with:
