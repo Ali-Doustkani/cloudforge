@@ -2,9 +2,13 @@
 set -euo pipefail
 
 RESOURCE_GROUP="rg-bootstrap"
-STORAGE_ACCOUNT="st-tfstate"
 CONTAINER="tfstate"
 LOCATION="austriaeast"
+
+# Derive a deterministic unique suffix from the subscription ID
+SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+SUFFIX=$(echo -n "$SUBSCRIPTION_ID" | md5sum | cut -c1-8)
+STORAGE_ACCOUNT="sttfstate${SUFFIX}"
 
 # Create resource group (idempotent)
 az group create \
@@ -27,3 +31,10 @@ az storage container create \
   --name "$CONTAINER" \
   --account-name "$STORAGE_ACCOUNT" \
   --auth-mode login
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cat > "$SCRIPT_DIR/backend.hcl" <<EOF
+storage_account_name = "$STORAGE_ACCOUNT"
+EOF
+
+echo "Bootstrap complete. Storage account: $STORAGE_ACCOUNT"

@@ -1,9 +1,8 @@
 terraform {
   backend "azurerm" {
-    resource_group_name  = "rg-bootstrap"
-    storage_account_name = "st-tfstate"
-    container_name       = "tfstate"
-    key                  = "app.tfstate"
+    resource_group_name = "rg-bootstrap"
+    container_name      = "tfstate"
+    key                 = "app.tfstate"
   }
 }
 
@@ -19,6 +18,7 @@ variable "ver" {
 locals {
   workload            = "cloudforge"
   suffix              = substr(md5(data.azurerm_subscription.current.id), 0, 6)
+  bootstrap_storage_account = "sttfstate${substr(md5(data.azurerm_subscription.current.subscription_id), 0, 8)}"
   rg_name             = "rg-${local.workload}"
   asp_name            = "asp-${local.workload}"
   app_name            = "app-${local.workload}"
@@ -35,7 +35,7 @@ data "terraform_remote_state" "platform" {
   backend = "azurerm"
   config = {
     resource_group_name  = "rg-bootstrap"
-    storage_account_name = "st-tfstate"
+    storage_account_name = local.bootstrap_storage_account
     container_name       = "tfstate"
     key                  = "platform.tfstate"
   }
