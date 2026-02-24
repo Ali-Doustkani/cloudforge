@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-RESOURCE_GROUP="tfstate-rg"
+RESOURCE_GROUP="rg-bootstrap"
 STORAGE_ACCOUNT="cftfstate"
 CONTAINER="tfstate"
 LOCATION="austriaeast"
