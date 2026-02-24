@@ -21,6 +21,12 @@ jobs:
       - run: terraform init -backend-config=../bootstrap/backend.hcl
       - run: terraform validate
       - run: terraform plan -var="ver=${{ github.sha }}" -out=tfplan
+      - name: Warn on deletions
+        run: |
+          deletes=$(terraform show -json tfplan | jq '[.resource_changes[]? | select(.change.actions[] == "delete")] | length')
+          if [ "$deletes" -gt 0 ]; then
+            echo "::warning::Terraform plan contains $deletes resource deletion(s). Review before merging."
+          fi
       - run: terraform apply -auto-approve tfplan
       - name: Prepare test environment
         id: prepare_test_env
