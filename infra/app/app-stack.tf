@@ -16,16 +16,12 @@ variable "ver" {
   description = "version of the infrastructure. git sha."
 }
 
-variable "group_name" {
-  type        = string
-  description = "Resource group name (e.g. rg)"
-}
-
 locals {
-  asp_name            = "cf-${var.group_name}-asp"
-  app_name            = "cf-${var.group_name}-app"
-  appcs_name          = "cf-${var.group_name}-appcs"
-  kv_name             = "cf-${var.group_name}-kv"
+  workload            = "cloudforge"
+  asp_name            = "cf-${local.workload}-asp"
+  app_name            = "cf-${local.workload}-app"
+  appcs_name          = "cf-${local.workload}-appcs"
+  kv_name             = "cf-${local.workload}-kv"
   acr_rg              = "platform"
   acr_name            = "cfplatformacr"
   github_sp_object_id = "2aa460f0-b63a-465d-8d73-a2662efc80e2"
@@ -39,7 +35,7 @@ data "azurerm_container_registry" "acr" {
 }
 
 resource "azurerm_resource_group" "app" {
-  name     = var.group_name
+  name     = local.workload
   location = "austriaeast"
   tags = {
     type    = "app"

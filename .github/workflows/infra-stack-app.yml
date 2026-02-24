@@ -2,10 +2,6 @@ name: Infra Stack App
 run-name: ${{ github.sha }}
 on:
   workflow_dispatch:
-    inputs:
-      groupName:
-        description: "Resource Group Name"
-        default: "rg"
 permissions:
   actions: write
 jobs:
@@ -23,14 +19,14 @@ jobs:
       - uses: hashicorp/setup-terraform@v3
       - run: terraform init
       - run: terraform validate
-      - run: terraform plan -var="ver=${{ github.sha }}" -var="group_name=${{ github.event.inputs.groupName }}" -out=tfplan
+      - run: terraform plan -var="ver=${{ github.sha }}" -out=tfplan
       - run: terraform apply -auto-approve tfplan
       - name: Prepare test environment
         id: prepare_test_env
         working-directory: ${{ github.workspace }}
         run: |
           # Read terraform outputs
-          group="${{ github.event.inputs.groupName }}"
+          group="cloudforge"
           acr_name=$(terraform -chdir=infra/app output -raw acr_name)
           app_name=$(terraform -chdir=infra/app output -raw app_service_name)
           kv_name=$(terraform -chdir=infra/app output -raw key_vault_name)
