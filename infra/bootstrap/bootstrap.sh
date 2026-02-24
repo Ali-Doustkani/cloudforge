@@ -8,7 +8,7 @@ LOCATION="austriaeast"
 # Derive a deterministic unique suffix from the subscription ID
 SUBSCRIPTION_ID=$(az account show --query id -o tsv)
 SUFFIX=$(echo -n "$SUBSCRIPTION_ID" | md5sum | cut -c1-8)
-STORAGE_ACCOUNT="sttfstate${SUFFIX}"
+STORAGE_ACCOUNT="stbootstrap${SUFFIX}"
 
 # Create resource group (idempotent)
 az group create \

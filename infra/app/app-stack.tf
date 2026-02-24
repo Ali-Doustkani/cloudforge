@@ -18,7 +18,7 @@ variable "ver" {
 locals {
   workload            = "cloudforge"
   suffix              = substr(md5(data.azurerm_subscription.current.id), 0, 6)
-  bootstrap_storage_account = "sttfstate${substr(md5(data.azurerm_subscription.current.subscription_id), 0, 8)}"
+  bootstrap_storage_account = "stbootstrap${substr(md5(data.azurerm_subscription.current.subscription_id), 0, 8)}"
   rg_name             = "rg-${local.workload}"
   asp_name            = "asp-${local.workload}"
   app_name            = "app-${local.workload}"
