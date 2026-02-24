@@ -2,7 +2,7 @@
 set -euo pipefail
 
 RESOURCE_GROUP="rg-bootstrap"
-STORAGE_ACCOUNT="cftfstate"
+STORAGE_ACCOUNT="st-tfstate"
 CONTAINER="tfstate"
 LOCATION="austriaeast"
 
