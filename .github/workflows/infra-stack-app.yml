@@ -16,8 +16,9 @@ jobs:
       - uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - run: bash ../bootstrap/bootstrap.sh
       - uses: hashicorp/setup-terraform@v3
-      - run: terraform init
+      - run: terraform init -backend-config=../bootstrap/backend.hcl
       - run: terraform validate
       - run: terraform plan -var="ver=${{ github.sha }}" -out=tfplan
       - run: terraform apply -auto-approve tfplan
