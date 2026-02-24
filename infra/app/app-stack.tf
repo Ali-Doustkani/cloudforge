@@ -19,10 +19,11 @@ variable "ver" {
 locals {
   workload            = "cloudforge"
   suffix              = substr(md5(data.azurerm_subscription.current.id), 0, 6)
-  asp_name            = "cf-${local.workload}-asp"
-  app_name            = "cf-${local.workload}-app"
-  appcs_name          = "cf-${local.workload}-appcs"
-  kv_name             = "cf-${local.workload}-kv"
+  rg_name             = "rg-${local.workload}"
+  asp_name            = "asp-${local.workload}"
+  app_name            = "app-${local.workload}"
+  appcs_name          = "appcs-${local.workload}"
+  kv_name             = "kv-${local.workload}-${local.suffix}"
   acr_rg              = "rg-platform"
   acr_name            = "crplatform${local.suffix}"
   github_sp_object_id = "2aa460f0-b63a-465d-8d73-a2662efc80e2"
@@ -38,7 +39,7 @@ data "azurerm_container_registry" "acr" {
 }
 
 resource "azurerm_resource_group" "app" {
-  name     = local.workload
+  name     = local.rg_name
   location = "austriaeast"
   tags = {
     type    = "app"

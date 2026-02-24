@@ -26,7 +26,7 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           # Read terraform outputs
-          group="cloudforge"
+          group="rg-cloudforge"
           acr_name=$(terraform -chdir=infra/app output -raw acr_name)
           app_name=$(terraform -chdir=infra/app output -raw app_service_name)
           kv_name=$(terraform -chdir=infra/app output -raw key_vault_name)
