@@ -1,7 +1,9 @@
 name: App
 run-name: ${{ github.sha }}
-on: 
+on:
   push:
+    paths:
+      - 'src/**'
   workflow_dispatch:
 
 jobs:
