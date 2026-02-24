@@ -26,6 +26,8 @@ jobs:
           deletes=$(terraform show -json tfplan | jq '[.resource_changes[]? | select(.change.actions[] == "delete")] | length')
           if [ "$deletes" -gt 0 ]; then
             echo "::warning::Terraform plan contains $deletes resource deletion(s). Review before merging."
+          else
+            echo "::notice::No resource deletions in this plan."
           fi
       - run: terraform apply -auto-approve tfplan
       - name: Prepare test environment
