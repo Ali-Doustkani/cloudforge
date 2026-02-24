@@ -22,10 +22,6 @@ variable "ver" {
   description = "version of the infrastructure. git sha."
 }
 
-output "acr_name" {
-  value = azurerm_container_registry.acr.name
-}
-
 resource "azurerm_resource_group" "main" {
   name     = "rg-platform"
   location = "austriaeast"
@@ -41,4 +37,8 @@ resource "azurerm_container_registry" "acr" {
   resource_group_name = azurerm_resource_group.main.name
 
   sku = "Basic"
+}
+
+output "acr_name" {
+  value = azurerm_container_registry.acr.name
 }

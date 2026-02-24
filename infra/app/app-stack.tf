@@ -24,8 +24,6 @@ locals {
   app_name            = "app-${local.workload}"
   appcs_name          = "appcs-${local.workload}"
   kv_name             = "kv-${local.workload}-${local.suffix}"
-  acr_rg              = "rg-platform"
-  acr_name            = "crplatform${local.suffix}"
   github_sp_object_id = "2aa460f0-b63a-465d-8d73-a2662efc80e2"
 }
 
@@ -33,9 +31,19 @@ data "azurerm_client_config" "current" {}
 
 data "azurerm_subscription" "current" {}
 
+data "terraform_remote_state" "platform" {
+  backend = "azurerm"
+  config = {
+    resource_group_name  = "tfstate-rg"
+    storage_account_name = "cftfstate"
+    container_name       = "tfstate"
+    key                  = "platform.tfstate"
+  }
+}
+
 data "azurerm_container_registry" "acr" {
-  name                = local.acr_name
-  resource_group_name = local.acr_rg
+  name                = data.terraform_remote_state.platform.outputs.acr_name
+  resource_group_name = "rg-platform"
 }
 
 resource "azurerm_resource_group" "app" {
