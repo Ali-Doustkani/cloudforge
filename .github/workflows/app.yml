@@ -31,11 +31,12 @@ jobs:
           acrLoginServer=$(az acr show --name $acrName --query loginServer -o tsv)
           webAppName=$(terraform -chdir=infra/app output -raw app_service_name)
           appResourceGroup=$(az webapp list --query "[?name=='$webAppName'].resourceGroup" -o tsv)
+          echo "acrName=$acrName" >> $GITHUB_ENV
           echo "acrLoginServer=$acrLoginServer" >> $GITHUB_ENV
           echo "webAppName=$webAppName" >> $GITHUB_ENV
           echo "appResourceGroup=$appResourceGroup" >> $GITHUB_ENV
       - name: ACR Login
-        run: az acr login --name $acrLoginServer
+        run: az acr login --name ${{ env.acrName }}
       - name: Build and push image
         uses: docker/build-push-action@v5
         with:
