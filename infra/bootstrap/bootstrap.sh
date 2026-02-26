@@ -32,7 +32,8 @@ if ! az storage account show --name "$STORAGE_ACCOUNT" --resource-group "$RESOUR
     --sku Standard_LRS \
     --kind StorageV2 \
     --allow-blob-public-access false \
-    --min-tls-version TLS1_2
+    --min-tls-version TLS1_2 \
+    --tags type=terraform-backend
 else
   echo "Storage account '$STORAGE_ACCOUNT' already exists, skipping."
 fi

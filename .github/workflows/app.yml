@@ -14,31 +14,34 @@ jobs:
         uses: actions/checkout@v4
       - name: Azure Login
         uses: azure/login@v2
-        with: 
+        with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - uses: hashicorp/setup-terraform@v3
+      - name: Find Terraform Backend
+        run: |
+          storageAccountName=$(az storage account list --resource-group rg-bootstrap --query "[?tags.type=='terraform-backend'].name" -o tsv)
+          echo "storageAccountName=$storageAccountName" >> $GITHUB_ENV
+      - name: Terraform Init
+        working-directory: infra/app
+        run: terraform init -backend-config="storage_account_name=$storageAccountName"
+      - name: Get Infrastructure Outputs
+        run: |
+          acrName=$(terraform -chdir=infra/app output -raw acr_name)
+          acrLoginServer=$(az acr show --name $acrName --query loginServer -o tsv)
+          webAppName=$(terraform -chdir=infra/app output -raw app_service_name)
+          appResourceGroup=$(az webapp list --query "[?name=='$webAppName'].resourceGroup" -o tsv)
+          echo "acrLoginServer=$acrLoginServer" >> $GITHUB_ENV
+          echo "webAppName=$webAppName" >> $GITHUB_ENV
+          echo "appResourceGroup=$appResourceGroup" >> $GITHUB_ENV
       - name: ACR Login
-        run: az acr login --name cfplatformacr.azurecr.io
+        run: az acr login --name $acrLoginServer
       - name: Build and push image
         uses: docker/build-push-action@v5
         with:
           context: ./src
           push: true
           tags: |
-            cfplatformacr.azurecr.io/app:latest
-            cfplatformacr.azurecr.io/app:${{ github.sha }}
-      - name: Find Target Resource
-        run: |
-          platformResourceGroup=$(az group list --tag type=platform --query '[0].name' -o tsv)
-          echo "Platform Resource Group: $platformResourceGroup"
-          echo "platformResourceGroup=$platformResourceGroup" >> $GITHUB_ENV
-          appResourceGroup=$(az group list --tag type=app --query '[0].name' -o tsv)
-          echo "Resource Group: $appResourceGroup"
-          echo "appResourceGroup=$appResourceGroup" >> $GITHUB_ENV
-          webAppName=$(az webapp list --resource-group $appResourceGroup --query '[0].name' -o tsv)
-          echo "Web App Name: $webAppName"
-          echo "webAppName=$webAppName" >> $GITHUB_ENV
-          acrLoginServer=$(az acr list --resource-group $platformResourceGroup --query '[0].loginServer' -o tsv)
-          echo "ACR Login Server: $acrLoginServer"
-          echo "acrLoginServer=$acrLoginServer" >> $GITHUB_ENV
+            ${{ env.acrLoginServer }}/app:latest
+            ${{ env.acrLoginServer }}/app:${{ github.sha }}
       - name: Upgrade App Service
         run: az webapp config container set --resource-group $appResourceGroup --name $webAppName --container-image-name $acrLoginServer/app:${{ github.sha }}
