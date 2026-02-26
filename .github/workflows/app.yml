@@ -20,6 +20,7 @@ jobs:
       - name: Find Terraform Backend
         run: |
           storageAccountName=$(az storage account list --resource-group rg-bootstrap --query "[?tags.type=='terraform-backend'].name" -o tsv)
+          echo "Storage Account Name: $storageAccountName"
           echo "storageAccountName=$storageAccountName" >> $GITHUB_ENV
       - name: Terraform Init
         working-directory: infra/app
