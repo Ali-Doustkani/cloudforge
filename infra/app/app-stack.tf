@@ -105,11 +105,12 @@ resource "azurerm_key_vault" "main" {
 }
 
 resource "azurerm_cosmosdb_account" "db" {
-  name                = "cosmos-${local.workload}"
-  location            = azurerm_resource_group.app.location
-  resource_group_name = azurerm_resource_group.app.name
-  free_tier_enabled   = true
-  offer_type          = "Standard"
+  name                          = "cosmos-${local.workload}"
+  location                      = azurerm_resource_group.app.location
+  resource_group_name           = azurerm_resource_group.app.name
+  free_tier_enabled             = true
+  offer_type                    = "Standard"
+  local_authentication_disabled = true
   consistency_policy {
     consistency_level = "Session"
   }
@@ -148,6 +149,8 @@ resource "azurerm_role_assignment" "app_config_data_owner" {
   role_definition_name = "App Configuration Data Owner"
   principal_id         = local.github_sp_object_id
 }
+
+resource "azurerm_role_assignment" ""
 
 output "acr_name" {
   value = data.azurerm_container_registry.acr.name
