@@ -50,7 +50,7 @@ run "web_app" {
   command = plan
 
   assert {
-    condition     = azurerm_linux_web_app.main.site_config.container_registry_use_managed_identity == true
+    condition     = azurerm_linux_web_app.main.site_config[0].container_registry_use_managed_identity == true
     error_message = "Web App must access ACR via managed identity"
   }
 }
