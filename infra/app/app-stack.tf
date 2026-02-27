@@ -25,7 +25,6 @@ variable "ver" {
 locals {
   workload            = "cloudforge"
   suffix              = substr(md5(data.azurerm_subscription.current.id), 0, 6)
-  bootstrap_storage_account = "stbootstrap${substr(md5(data.azurerm_subscription.current.subscription_id), 0, 8)}"
   rg_name             = "rg-${local.workload}"
   asp_name            = "asp-${local.workload}"
   app_name            = "app-${local.workload}"
@@ -42,7 +41,7 @@ data "terraform_remote_state" "platform" {
   backend = "azurerm"
   config = {
     resource_group_name  = "rg-bootstrap"
-    storage_account_name = local.bootstrap_storage_account
+    storage_account_name = "stbootstrap${substr(md5(data.azurerm_subscription.current.subscription_id), 0, 8)}"
     container_name       = "tfstate"
     key                  = "platform.tfstate"
   }
@@ -108,6 +107,21 @@ resource "azurerm_key_vault" "main" {
   tenant_id                  = data.azurerm_client_config.current.tenant_id
   sku_name                   = "standard"
   rbac_authorization_enabled = true
+}
+
+resource "azurerm_cosmosdb_account" "db" {
+  name                = "cosmos-${local.workload}"
+  location            = azurerm_resource_group.app.location
+  resource_group_name = azurerm_resource_group.app.name
+  free_tier_enabled   = true
+  offer_type          = "Standard"
+  consistency_policy {
+    consistency_level = "Session"
+  }
+  geo_location {
+    location          = azurerm_resource_group.app.location
+    failover_priority = 0
+  }
 }
 
 resource "azurerm_role_assignment" "app_config_reader" {

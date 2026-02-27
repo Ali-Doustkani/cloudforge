@@ -36,7 +36,7 @@ run "resource_group" {
   }
 
   assert {
-    condition     = azurerm_resource_group.app.tags["version"] == var.ver
+    condition     = azurerm_resource_group.app.tags["version"] == "the-version"
     error_message = "Resource group must be tagged with the infrastructure version"
   }
 
@@ -75,5 +75,14 @@ run "app_config" {
   assert {
     condition     = azurerm_app_configuration.main.sku == "free"
     error_message = "App Configuration SKU must be 'free'"
+  }
+}
+
+run "cosmos_db" {
+  command = plan
+
+  assert {
+    condition     = azurerm_cosmosdb_account.db.free_tier_enabled == true
+    error_message = "Cosmos DB free tier must be enabled"
   }
 }
