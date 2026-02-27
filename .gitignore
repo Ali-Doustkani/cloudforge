@@ -58,3 +58,4 @@ terraform.tfstate
 terraform.tfstate.backup
 *.tfplan
 backend.hcl
+tfplan
