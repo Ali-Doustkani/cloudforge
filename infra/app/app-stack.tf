@@ -150,7 +150,13 @@ resource "azurerm_role_assignment" "app_config_data_owner" {
   principal_id         = local.github_sp_object_id
 }
 
-resource "azurerm_role_assignment" ""
+resource "azurerm_cosmosdb_sql_role_assignment" "db_contributor" {
+  resource_group_name = azurerm_resource_group.app.name
+  account_name        = azurerm_cosmosdb_account.db.name
+  role_definition_id  = "${azurerm_cosmosdb_account.db.id}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002"
+  principal_id        = azurerm_linux_web_app.main.identity[0].principal_id
+  scope               = azurerm_cosmosdb_account.db.id
+}
 
 output "acr_name" {
   value = data.azurerm_container_registry.acr.name
