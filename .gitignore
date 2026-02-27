@@ -50,3 +50,11 @@ package.json
 
 # Python
 .venv
+
+# Terraform
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+*.tfplan
+backend.hcl
