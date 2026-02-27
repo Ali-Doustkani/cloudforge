@@ -25,11 +25,6 @@ variable "ver" {
 locals {
   workload            = "cloudforge"
   suffix              = substr(md5(data.azurerm_subscription.current.id), 0, 6)
-  rg_name             = "rg-${local.workload}"
-  asp_name            = "asp-${local.workload}"
-  app_name            = "app-${local.workload}"
-  appcs_name          = "appcs-${local.workload}"
-  kv_name             = "kv-${local.workload}-${local.suffix}"
   github_sp_object_id = "2aa460f0-b63a-465d-8d73-a2662efc80e2"
 }
 
@@ -53,7 +48,7 @@ data "azurerm_container_registry" "acr" {
 }
 
 resource "azurerm_resource_group" "app" {
-  name     = local.rg_name
+  name     = "rg-${local.workload}"
   location = "austriaeast"
   tags = {
     type    = "app"
@@ -62,7 +57,7 @@ resource "azurerm_resource_group" "app" {
 }
 
 resource "azurerm_service_plan" "main" {
-  name                = local.asp_name
+  name                = "asp-${local.workload}"
   location            = azurerm_resource_group.app.location
   resource_group_name = azurerm_resource_group.app.name
   os_type             = "Linux"
@@ -70,7 +65,7 @@ resource "azurerm_service_plan" "main" {
 }
 
 resource "azurerm_linux_web_app" "main" {
-  name                = local.app_name
+  name                = "app-${local.workload}"
   location            = azurerm_resource_group.app.location
   resource_group_name = azurerm_resource_group.app.name
   service_plan_id     = azurerm_service_plan.main.id
@@ -94,14 +89,14 @@ resource "azurerm_linux_web_app" "main" {
 }
 
 resource "azurerm_app_configuration" "main" {
-  name                = local.appcs_name
+  name                = "appcs-${local.workload}"
   location            = azurerm_resource_group.app.location
   resource_group_name = azurerm_resource_group.app.name
   sku                 = "free"
 }
 
 resource "azurerm_key_vault" "main" {
-  name                       = local.kv_name
+  name                       = "kv-${local.workload}-${local.suffix}"
   location                   = azurerm_resource_group.app.location
   resource_group_name        = azurerm_resource_group.app.name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
