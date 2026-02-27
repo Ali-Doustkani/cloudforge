@@ -25,6 +25,9 @@ jobs:
       - name: Terraform Init
         working-directory: infra/app
         run: terraform init -backend-config="storage_account_name=$storageAccountName"
+      - name: Terraform Test
+        working-directory: infra/app
+        run: terraform test
       - name: Get Infrastructure Outputs
         run: |
           acrName=$(terraform -chdir=infra/app output -raw acr_name)
