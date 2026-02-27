@@ -2,12 +2,20 @@ name: Infra Stack App
 run-name: ${{ github.sha }}
 on:
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        type: choice
+        options:
+          - stg
+          - prod
 permissions:
   actions: write
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: dev
+    environment: ${{ inputs.environment }}
     defaults:
       run:
         working-directory: infra/app
@@ -18,14 +26,14 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       - run: bash ../bootstrap/bootstrap.sh
       - uses: hashicorp/setup-terraform@v3
-      - run: terraform init -backend-config=../bootstrap/backend.hcl
+      - run: terraform init -backend-config=../bootstrap/backend.hcl -backend-config="key=app-${{ inputs.environment }}.tfstate"
       - uses: terraform-linters/setup-tflint@v4
       - run: tflint --init --config ../.tflint.hcl
       - run: tflint --config ../.tflint.hcl --force
       - run: terraform validate
-      - run: terraform test
+      - run: terraform test -var="ver=${{ github.sha }}" -var="environment=${{ inputs.environment }}"
         working-directory: infra/app
-      - run: terraform plan -var="ver=${{ github.sha }}" -out=tfplan
+      - run: terraform plan -var="ver=${{ github.sha }}" -var="environment=${{ inputs.environment }}" -out=tfplan
       - name: Warn on deletions
         run: |
           deletes=$(terraform show -json tfplan | jq '[.resource_changes[]? | select(.change.actions[] == "delete")] | length')
@@ -40,7 +48,7 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           # Read terraform outputs
-          group="rg-cloudforge"
+          group="rg-cloudforge-${{ inputs.environment }}"
           acr_name=$(terraform -chdir=infra/app output -raw acr_name)
           app_name=$(terraform -chdir=infra/app output -raw app_service_name)
           kv_name=$(terraform -chdir=infra/app output -raw key_vault_name)
