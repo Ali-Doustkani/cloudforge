@@ -5,10 +5,21 @@ on:
     paths:
       - 'src/**'
   workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        type: choice
+        options:
+          - stg
+          - prod
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'stg' }}
+    env:
+      TARGET_ENV: ${{ inputs.environment || 'stg' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,11 +31,10 @@ jobs:
       - name: Find Terraform Backend
         run: |
           storageAccountName=$(az storage account list --resource-group rg-bootstrap --query "[?tags.type=='terraform-backend'].name" -o tsv)
-          echo "Storage Account Name: $storageAccountName"
           echo "storageAccountName=$storageAccountName" >> $GITHUB_ENV
       - name: Terraform Init
         working-directory: infra/app
-        run: terraform init -backend-config="storage_account_name=$storageAccountName"
+        run: terraform init -backend-config="storage_account_name=$storageAccountName" -backend-config="key=app-${{ env.TARGET_ENV }}.tfstate"
       - name: Get Infrastructure Outputs
         run: |
           acrName=$(terraform -chdir=infra/app output -raw acr_name)
@@ -38,6 +48,7 @@ jobs:
       - name: ACR Login
         run: az acr login --name ${{ env.acrName }}
       - name: Build and push image
+        if: github.event_name == 'push' || inputs.environment == 'stg'
         uses: docker/build-push-action@v5
         with:
           context: ./src
