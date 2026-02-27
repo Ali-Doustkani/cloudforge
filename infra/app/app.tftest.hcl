@@ -41,7 +41,7 @@ run "resource_group" {
   }
 
   assert {
-    condition     = azurerm_resource_group.main.tags["type"] == "app"
+    condition     = azurerm_resource_group.app.tags["type"] == "app"
     error_message = "Resrouce group must be of type 'app'"
   }
 }
