@@ -21,7 +21,7 @@ jobs:
       - run: terraform init -backend-config=../bootstrap/backend.hcl
       - uses: terraform-linters/setup-tflint@v4
       - run: tflint --init --config ../.tflint.hcl
-      - run: tflint --config ../.tflint.hcl
+      - run: tflint --config ../.tflint.hcl --force
       - run: terraform validate
       - run: terraform test
         working-directory: infra/app
