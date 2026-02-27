@@ -39,6 +39,11 @@ run "resource_group" {
     condition     = azurerm_resource_group.app.tags["version"] == var.ver
     error_message = "Resource group must be tagged with the infrastructure version"
   }
+
+  assert {
+    condition     = azurerm_resource_group.main.tags["type"] == "app"
+    error_message = "Resrouce group must be of type 'app'"
+  }
 }
 
 run "web_app" {

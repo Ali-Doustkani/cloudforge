@@ -20,6 +20,8 @@ jobs:
       - uses: hashicorp/setup-terraform@v3
       - run: terraform init -backend-config=../bootstrap/backend.hcl
       - run: terraform validate
+      - run: terraform test
+        working-directory: infra/app
       - run: terraform plan -var="ver=${{ github.sha }}" -out=tfplan
       - name: Warn on deletions
         run: |
