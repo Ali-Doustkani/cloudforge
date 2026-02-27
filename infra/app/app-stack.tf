@@ -9,7 +9,6 @@ terraform {
   backend "azurerm" {
     resource_group_name = "rg-bootstrap"
     container_name      = "tfstate"
-    key                 = "app.tfstate"
   }
 }
 
@@ -22,9 +21,19 @@ variable "ver" {
   description = "version of the infrastructure. git sha."
 }
 
+variable "environment" {
+  type        = string
+  description = "deployment environment. allowed values: stg, prod."
+  validation {
+    condition     = contains(["stg", "prod"], var.environment)
+    error_message = "environment must be 'stg' or 'prod'."
+  }
+}
+
 locals {
   workload            = "cloudforge"
   suffix              = substr(md5(data.azurerm_subscription.current.id), 0, 6)
+  kv_suffix           = substr(md5(data.azurerm_subscription.current.id), 0, 5)
   github_sp_object_id = "2aa460f0-b63a-465d-8d73-a2662efc80e2"
 }
 
@@ -48,7 +57,7 @@ data "azurerm_container_registry" "acr" {
 }
 
 resource "azurerm_resource_group" "app" {
-  name     = "rg-${local.workload}"
+  name     = "rg-${local.workload}-${var.environment}"
   location = "austriaeast"
   tags = {
     type    = "app"
@@ -57,7 +66,7 @@ resource "azurerm_resource_group" "app" {
 }
 
 resource "azurerm_service_plan" "main" {
-  name                = "asp-${local.workload}"
+  name                = "asp-${local.workload}-${var.environment}"
   location            = azurerm_resource_group.app.location
   resource_group_name = azurerm_resource_group.app.name
   os_type             = "Linux"
@@ -65,7 +74,7 @@ resource "azurerm_service_plan" "main" {
 }
 
 resource "azurerm_linux_web_app" "main" {
-  name                = "app-${local.workload}"
+  name                = "app-${local.workload}-${var.environment}"
   location            = azurerm_resource_group.app.location
   resource_group_name = azurerm_resource_group.app.name
   service_plan_id     = azurerm_service_plan.main.id
@@ -89,14 +98,14 @@ resource "azurerm_linux_web_app" "main" {
 }
 
 resource "azurerm_app_configuration" "main" {
-  name                = "appcs-${local.workload}"
+  name                = "appcs-${local.workload}-${var.environment}"
   location            = azurerm_resource_group.app.location
   resource_group_name = azurerm_resource_group.app.name
   sku                 = "free"
 }
 
 resource "azurerm_key_vault" "main" {
-  name                       = "kv-${local.workload}-${local.suffix}"
+  name                       = "kv-${local.workload}-${var.environment}-${local.kv_suffix}"
   location                   = azurerm_resource_group.app.location
   resource_group_name        = azurerm_resource_group.app.name
   tenant_id                  = data.azurerm_client_config.current.tenant_id
@@ -105,7 +114,7 @@ resource "azurerm_key_vault" "main" {
 }
 
 resource "azurerm_cosmosdb_account" "db" {
-  name                          = "cosmos-${local.workload}"
+  name                          = "cosmos-${local.workload}-${var.environment}"
   location                      = azurerm_resource_group.app.location
   resource_group_name           = azurerm_resource_group.app.name
   free_tier_enabled             = true

@@ -25,7 +25,8 @@ override_data {
 }
 
 variables {
-  ver = "test"
+  ver         = "test"
+  environment = "stg"
 }
 
 run "resource_group" {
@@ -43,6 +44,11 @@ run "resource_group" {
   assert {
     condition     = azurerm_resource_group.app.tags["type"] == "app"
     error_message = "Resrouce group must be of type 'app'"
+  }
+
+  assert {
+    condition     = azurerm_resource_group.app.name == "rg-cloudforge-stg"
+    error_message = "Resource group name must include the environment suffix"
   }
 }
 
