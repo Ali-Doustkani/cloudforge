@@ -19,6 +19,9 @@ jobs:
       - run: bash ../bootstrap/bootstrap.sh
       - uses: hashicorp/setup-terraform@v3
       - run: terraform init -backend-config=../bootstrap/backend.hcl
+      - uses: terraform-linters/setup-tflint@v4
+      - run: tflint --init --config ../.tflint.hcl
+      - run: tflint --config ../.tflint.hcl
       - run: terraform validate
       - run: terraform test
         working-directory: infra/app
