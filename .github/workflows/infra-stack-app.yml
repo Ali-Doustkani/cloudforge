@@ -73,7 +73,7 @@ jobs:
           pytest ./infra/tests/tests.py --url ${{ steps.prepare_test_env.outputs.url }} --reruns 5 --reruns-delay 3
 
   deploy-prod:
-    needs: deploy-prod
+    needs: deploy-stg
     runs-on: ubuntu-latest
     environment: prod
     defaults:
