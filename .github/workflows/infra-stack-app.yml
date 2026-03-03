@@ -2,20 +2,12 @@ name: Infra Stack App
 run-name: ${{ github.sha }}
 on:
   workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Deployment environment'
-        required: true
-        type: choice
-        options:
-          - stg
-          - prod
 permissions:
   actions: write
 jobs:
-  deploy:
+  deploy-stg:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    environment: stg
     defaults:
       run:
         working-directory: infra/app
@@ -26,14 +18,14 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       - run: bash ../bootstrap/bootstrap.sh
       - uses: hashicorp/setup-terraform@v3
-      - run: terraform init -backend-config=../bootstrap/backend.hcl -backend-config="key=app-${{ inputs.environment }}.tfstate"
+      - run: terraform init -backend-config=../bootstrap/backend.hcl -backend-config="key=app-stg.tfstate"
       - uses: terraform-linters/setup-tflint@v4
       - run: tflint --init --config ../.tflint.hcl
       - run: tflint --config ../.tflint.hcl --force
       - run: terraform validate
-      - run: terraform test -var="ver=${{ github.sha }}" -var="environment=${{ inputs.environment }}"
+      - run: terraform test -var="ver=${{ github.sha }}" -var="environment=stg"
         working-directory: infra/app
-      - run: terraform plan -var="ver=${{ github.sha }}" -var="environment=${{ inputs.environment }}" -out=tfplan
+      - run: terraform plan -var="ver=${{ github.sha }}" -var="environment=stg" -out=tfplan
       - name: Warn on deletions
         run: |
           deletes=$(terraform show -json tfplan | jq '[.resource_changes[]? | select(.change.actions[] == "delete")] | length')
@@ -47,35 +39,28 @@ jobs:
         id: prepare_test_env
         working-directory: ${{ github.workspace }}
         run: |
-          # Read terraform outputs
-          group="rg-cloudforge-${{ inputs.environment }}"
           acr_name=$(terraform -chdir=infra/app output -raw acr_name)
           app_name=$(terraform -chdir=infra/app output -raw app_service_name)
           kv_name=$(terraform -chdir=infra/app output -raw key_vault_name)
           config_name=$(terraform -chdir=infra/app output -raw app_config_name)
 
-          # Import test image into ACR if not already present
           az acr repository show-tags --name $acr_name --repository testapp --query "[?@=='testversion']" -o tsv | grep -q . \
             || az acr import --name $acr_name --source ghcr.io/ali-doustkani/testapp:latest --image testapp:testversion
 
-          # Restart web app
-          az webapp restart --name $app_name --resource-group $group
+          az webapp restart --name $app_name --resource-group rg-cloudforge-stg
 
-          # Set app configuration key
           for i in {1..5}; do
             echo "Attempt $i: setting app config key"
             if az appconfig kv set --name $config_name --key infra_default --value infra_value --yes; then break; fi
             sleep 10
           done
 
-          # Set key vault secret
           for i in {1..5}; do
             echo "Attempt $i: setting secret in $kv_name"
             if az keyvault secret set --name infra-default --value infra_value --vault-name "$kv_name"; then break; fi
             sleep 10
           done
 
-          # Export app URL
           echo "url=https://$app_name.azurewebsites.net" >> $GITHUB_OUTPUT
       - uses: actions/setup-python@v5
         with:
@@ -86,3 +71,27 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pytest ./infra/tests/tests.py --url ${{ steps.prepare_test_env.outputs.url }} --reruns 5 --reruns-delay 3
+
+  deploy-prod:
+    needs: deploy-stg
+    runs-on: ubuntu-latest
+    environment: prod
+    defaults:
+      run:
+        working-directory: infra/app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform init -backend-config=../bootstrap/backend.hcl -backend-config="key=app-prod.tfstate"
+      - run: terraform plan -var="ver=${{ github.sha }}" -var="environment=prod" -out=tfplan
+      - name: Fail on deletions
+        run: |
+          deletes=$(terraform show -json tfplan | jq '[.resource_changes[]? | select(.change.actions[] == "delete")] | length')
+          if [ "$deletes" -gt 0 ]; then
+            echo "::error::Terraform plan contains $deletes resource deletion(s). Aborting."
+            exit 1
+          fi
+      - run: terraform apply -auto-approve tfplan
