@@ -24,8 +24,7 @@ jobs:
           echo "storageAccountName=$storageAccountName" >> $GITHUB_ENV
           echo "storageAccountName=$storageAccountName"
       - name: Terraform Init
-        working-directory: infra/app
-        run: terraform init -backend-config="storage_account_name=$storageAccountName" -backend-config="key=app-stg.tfstate"
+        run: terraform -chdir=infra/app init -backend-config="storage_account_name=$storageAccountName" -backend-config="key=app-stg.tfstate"
       - name: Get Infrastructure Outputs
         run: |
           acrName=$(terraform -chdir=infra/app output -raw acr_name)
@@ -68,8 +67,7 @@ jobs:
           echo "storageAccountName=$storageAccountName" >> $GITHUB_ENV
           echo "storageAccountName=$storageAccountName"
       - name: Terraform Init
-        working-directory: infra/app
-        run: terraform init -backend-config="storage_account_name=$storageAccountName" -backend-config="key=app-prod.tfstate"
+        run: terraform -chdir=infra/app init -backend-config="storage_account_name=$storageAccountName" -backend-config="key=app-prod.tfstate"
       - name: Get Infrastructure Outputs
         run: |
           acrLoginServer=$(az acr show --name $(terraform -chdir=infra/app output -raw acr_name) --query loginServer -o tsv)
