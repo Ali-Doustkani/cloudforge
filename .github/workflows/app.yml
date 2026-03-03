@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-stg:
+  build:
     runs-on: ubuntu-latest
     environment: stg
     steps:
@@ -25,17 +25,13 @@ jobs:
           echo "storageAccountName=$storageAccountName"
       - name: Terraform Init
         run: terraform -chdir=infra/app init -backend-config="storage_account_name=$storageAccountName" -backend-config="key=app-stg.tfstate"
-      - name: Get Infrastructure Outputs
+      - name: Get ACR Details
         run: |
           acrName=$(terraform -chdir=infra/app output -raw acr_name)
           acrLoginServer=$(az acr show --name $acrName --query loginServer -o tsv)
-          webAppName=$(terraform -chdir=infra/app output -raw app_service_name)
-          appResourceGroup=$(az webapp list --query "[?name=='$webAppName'].resourceGroup" -o tsv)
           echo "acrName=$acrName" >> $GITHUB_ENV
           echo "acrLoginServer=$acrLoginServer" >> $GITHUB_ENV
-          echo "webAppName=$webAppName" >> $GITHUB_ENV
-          echo "appResourceGroup=$appResourceGroup" >> $GITHUB_ENV
-          echo "acrName=$acrName acrLoginServer=$acrLoginServer webAppName=$webAppName appResourceGroup=$appResourceGroup"
+          echo "acrName=$acrName acrLoginServer=$acrLoginServer"
       - name: ACR Login
         run: az acr login --name ${{ env.acrName }}
       - name: Build and push image
@@ -46,36 +42,19 @@ jobs:
           tags: |
             ${{ env.acrLoginServer }}/app:latest
             ${{ env.acrLoginServer }}/app:${{ github.sha }}
-      - name: Upgrade App Service
-        run: az webapp config container set --resource-group $appResourceGroup --name $webAppName --container-image-name $acrLoginServer/app:${{ github.sha }}
+
+  deploy-stg:
+    needs: build
+    uses: ./.github/workflows/deploy-app.yml
+    with:
+      environment: stg
+      tfstate_key: app-stg.tfstate
+    secrets: inherit
 
   deploy-prod:
     needs: deploy-stg
-    runs-on: ubuntu-latest
-    environment: prod
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-      - uses: hashicorp/setup-terraform@v3
-      - name: Find Terraform Backend
-        run: |
-          storageAccountName=$(az storage account list --resource-group rg-bootstrap --query "[?tags.type=='terraform-backend'].name" -o tsv)
-          echo "storageAccountName=$storageAccountName" >> $GITHUB_ENV
-          echo "storageAccountName=$storageAccountName"
-      - name: Terraform Init
-        run: terraform -chdir=infra/app init -backend-config="storage_account_name=$storageAccountName" -backend-config="key=app-prod.tfstate"
-      - name: Get Infrastructure Outputs
-        run: |
-          acrLoginServer=$(az acr show --name $(terraform -chdir=infra/app output -raw acr_name) --query loginServer -o tsv)
-          webAppName=$(terraform -chdir=infra/app output -raw app_service_name)
-          appResourceGroup=$(az webapp list --query "[?name=='$webAppName'].resourceGroup" -o tsv)
-          echo "acrLoginServer=$acrLoginServer" >> $GITHUB_ENV
-          echo "webAppName=$webAppName" >> $GITHUB_ENV
-          echo "appResourceGroup=$appResourceGroup" >> $GITHUB_ENV
-          echo "acrLoginServer=$acrLoginServer webAppName=$webAppName appResourceGroup=$appResourceGroup"
-      - name: Upgrade App Service
-        run: az webapp config container set --resource-group $appResourceGroup --name $webAppName --container-image-name $acrLoginServer/app:${{ github.sha }}
+    uses: ./.github/workflows/deploy-app.yml
+    with:
+      environment: prod
+      tfstate_key: app-prod.tfstate
+    secrets: inherit
