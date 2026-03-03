@@ -84,16 +84,16 @@ run "app_config" {
   }
 }
 
-run "cosmos_db" {
-  command = plan
+# run "cosmos_db" {
+#   command = plan
 
-  assert {
-    condition     = azurerm_cosmosdb_account.db.free_tier_enabled == true
-    error_message = "Cosmos DB free tier must be enabled"
-  }
+#   assert {
+#     condition     = azurerm_cosmosdb_account.db.free_tier_enabled == true
+#     error_message = "Cosmos DB free tier must be enabled"
+#   }
 
-  assert {
-    condition     = azurerm_cosmosdb_account.db.local_authentication_disabled == true
-    error_message = "Cosmos DB Key-based authentication must be disabled"
-  }
-}
+#   assert {
+#     condition     = azurerm_cosmosdb_account.db.local_authentication_disabled == true
+#     error_message = "Cosmos DB Key-based authentication must be disabled"
+#   }
+# }

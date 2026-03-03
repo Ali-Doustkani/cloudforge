@@ -113,21 +113,21 @@ resource "azurerm_key_vault" "main" {
   rbac_authorization_enabled = true
 }
 
-resource "azurerm_cosmosdb_account" "db" {
-  name                          = "cosmos-${local.workload}-${var.environment}"
-  location                      = azurerm_resource_group.app.location
-  resource_group_name           = azurerm_resource_group.app.name
-  free_tier_enabled             = true
-  offer_type                    = "Standard"
-  local_authentication_disabled = true
-  consistency_policy {
-    consistency_level = "Session"
-  }
-  geo_location {
-    location          = azurerm_resource_group.app.location
-    failover_priority = 0
-  }
-}
+# resource "azurerm_cosmosdb_account" "db" {
+#   name                          = "cosmos-${local.workload}-${var.environment}"
+#   location                      = azurerm_resource_group.app.location
+#   resource_group_name           = azurerm_resource_group.app.name
+#   free_tier_enabled             = true
+#   offer_type                    = "Standard"
+#   local_authentication_disabled = true
+#   consistency_policy {
+#     consistency_level = "Session"
+#   }
+#   geo_location {
+#     location          = azurerm_resource_group.app.location
+#     failover_priority = 0
+#   }
+# }
 
 resource "azurerm_role_assignment" "app_config_reader" {
   scope                = azurerm_app_configuration.main.id
