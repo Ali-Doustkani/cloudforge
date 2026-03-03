@@ -22,6 +22,7 @@ jobs:
         run: |
           storageAccountName=$(az storage account list --resource-group rg-bootstrap --query "[?tags.type=='terraform-backend'].name" -o tsv)
           echo "storageAccountName=$storageAccountName" >> $GITHUB_ENV
+          echo "storageAccountName=$storageAccountName"
       - name: Terraform Init
         working-directory: infra/app
         run: terraform init -backend-config="storage_account_name=$storageAccountName" -backend-config="key=app-stg.tfstate"
@@ -35,6 +36,7 @@ jobs:
           echo "acrLoginServer=$acrLoginServer" >> $GITHUB_ENV
           echo "webAppName=$webAppName" >> $GITHUB_ENV
           echo "appResourceGroup=$appResourceGroup" >> $GITHUB_ENV
+          echo "acrName=$acrName acrLoginServer=$acrLoginServer webAppName=$webAppName appResourceGroup=$appResourceGroup"
       - name: ACR Login
         run: az acr login --name ${{ env.acrName }}
       - name: Build and push image
@@ -64,6 +66,7 @@ jobs:
         run: |
           storageAccountName=$(az storage account list --resource-group rg-bootstrap --query "[?tags.type=='terraform-backend'].name" -o tsv)
           echo "storageAccountName=$storageAccountName" >> $GITHUB_ENV
+          echo "storageAccountName=$storageAccountName"
       - name: Terraform Init
         working-directory: infra/app
         run: terraform init -backend-config="storage_account_name=$storageAccountName" -backend-config="key=app-prod.tfstate"
@@ -75,5 +78,6 @@ jobs:
           echo "acrLoginServer=$acrLoginServer" >> $GITHUB_ENV
           echo "webAppName=$webAppName" >> $GITHUB_ENV
           echo "appResourceGroup=$appResourceGroup" >> $GITHUB_ENV
+          echo "acrLoginServer=$acrLoginServer webAppName=$webAppName appResourceGroup=$appResourceGroup"
       - name: Upgrade App Service
         run: az webapp config container set --resource-group $appResourceGroup --name $webAppName --container-image-name $acrLoginServer/app:${{ github.sha }}
