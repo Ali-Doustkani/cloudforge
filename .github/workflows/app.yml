@@ -45,7 +45,7 @@ jobs:
 
   deploy-stg:
     needs: build
-    uses: ./.github/workflows/deploy-app.yml
+    uses: ./.github/workflows/templates/deploy-app.yml
     with:
       environment: stg
       tfstate_key: app-stg.tfstate
@@ -53,7 +53,7 @@ jobs:
 
   deploy-prod:
     needs: deploy-stg
-    uses: ./.github/workflows/deploy-app.yml
+    uses: ./.github/workflows/templates/deploy-app.yml
     with:
       environment: prod
       tfstate_key: app-prod.tfstate
