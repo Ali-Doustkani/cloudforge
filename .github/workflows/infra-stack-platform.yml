@@ -21,6 +21,7 @@ jobs:
       run:
         working-directory: infra/platform
     steps:
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/infra-setup
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
