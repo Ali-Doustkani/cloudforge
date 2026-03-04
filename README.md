@@ -48,13 +48,31 @@ az deployment group create -g rg --template-file ./infra/infra.bicep
 
 **To integrate github with azure:**
 
-You need to define a service principal in Entra for github. When you do that azure creates you a json authentication including a secret which you can use for your applications. Keep this secret in a safe place as you can't access it again. 
+Create a service principal in Entra:
 ``` sh
-az ad sp create-for-rbac --name myspname --json-auth
+az ad sp create-for-rbac --name myspname
 ```
-The content of this command can be saved in a secret called `AZURE_CREDENTIALS` in github secrets and be used.
 
-This service principal might not have enough permissions to do things (role assignments). You need to give it proper access for that. 
+Add a federated credential to trust GitHub Actions:
+``` sh
+az ad app federated-credential create \
+  --id <app-object-id> \
+  --parameters '{
+    "name": "github-main",
+    "issuer": "https://token.actions.githubusercontent.com",
+    "subject": "repo:<org>/<repo>:ref:refs/heads/main",
+    "audiences": ["api://AzureADTokenExchange"]
+  }'
+```
+
+Add three secrets to GitHub (`AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`):
+``` sh
+az ad sp list --display-name myspname --query "[].appId" -o tsv  # AZURE_CLIENT_ID
+az account show --query tenantId -o tsv                          # AZURE_TENANT_ID
+az account show --query id -o tsv                                # AZURE_SUBSCRIPTION_ID
+```
+
+The service principal might not have enough permissions to do things (role assignments). You need to give it proper access for that.
 
 **OAuth2.0 Access Token Response**
 ``` json
