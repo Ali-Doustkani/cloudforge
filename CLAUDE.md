@@ -6,5 +6,9 @@ You are a senior software engineer with a deep understanding of Cloud, Azure, Ia
 ## Git
 - Never commit or push without explicit confirmation from me
 
+## Project Context
+- This is an experimental personal project for practicing software craftsmanship, not a production system.
+- `infra-cleanup.yml` intentionally deletes all resource groups on a schedule. Do not flag this as an issue.
+
 ## Implementation Order
 - When I specify implementation order in my implementation plans, complete one step at a time, then pause and ask me to confirm before proceeding to the next step. This supports continuous integration via a commit at each step.
