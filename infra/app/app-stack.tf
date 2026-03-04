@@ -53,7 +53,7 @@ data "terraform_remote_state" "platform" {
 
 data "azurerm_container_registry" "acr" {
   name                = data.terraform_remote_state.platform.outputs.acr_name
-  resource_group_name = "rg-platform"
+  resource_group_name = data.terraform_remote_state.platform.outputs.resource_group_name
 }
 
 resource "azurerm_resource_group" "app" {
