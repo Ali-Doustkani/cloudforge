@@ -18,14 +18,11 @@ jobs:
       run:
         working-directory: infra/app
     steps:
-      - uses: actions/checkout@v4
-      - uses: azure/login@v2
+      - uses: ./.github/actions/infra-setup
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - run: bash ../bootstrap/bootstrap.sh
-      - uses: hashicorp/setup-terraform@v3
       - run: terraform init -backend-config=../bootstrap/backend.hcl -backend-config="key=app-stg.tfstate"
       - uses: terraform-linters/setup-tflint@v4
       - run: tflint --init --config ../.tflint.hcl
@@ -95,14 +92,11 @@ jobs:
     outputs:
       has_deletions: ${{ steps.check_deletions.outputs.has_deletions }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: azure/login@v2
+      - uses: ./.github/actions/infra-setup
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - run: bash ../bootstrap/bootstrap.sh
-      - uses: hashicorp/setup-terraform@v3
       - run: terraform init -backend-config=../bootstrap/backend.hcl -backend-config="key=app-prod.tfstate"
       - run: terraform plan -var="ver=${{ github.sha }}" -var="environment=prod" -out=tfplan
       - name: Check for deletions
@@ -143,14 +137,11 @@ jobs:
       run:
         working-directory: infra/app
     steps:
-      - uses: actions/checkout@v4
-      - uses: azure/login@v2
+      - uses: ./.github/actions/infra-setup
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - run: bash ../bootstrap/bootstrap.sh
-      - uses: hashicorp/setup-terraform@v3
       - run: terraform init -backend-config=../bootstrap/backend.hcl -backend-config="key=app-prod.tfstate"
       - uses: actions/download-artifact@v4
         with:

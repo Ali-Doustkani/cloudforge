@@ -1,0 +1,23 @@
+name: Infra Setup
+description: Checkout, Azure login, bootstrap, and Terraform setup
+
+inputs:
+  client-id:
+    required: true
+  tenant-id:
+    required: true
+  subscription-id:
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v4
+    - uses: azure/login@v2
+      with:
+        client-id: ${{ inputs.client-id }}
+        tenant-id: ${{ inputs.tenant-id }}
+        subscription-id: ${{ inputs.subscription-id }}
+    - run: bash infra/bootstrap/bootstrap.sh
+      shell: bash
+    - uses: hashicorp/setup-terraform@v3
