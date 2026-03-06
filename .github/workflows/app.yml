@@ -61,7 +61,10 @@ jobs:
     with:
       environment: stg
       tfstate_key: app-stg.tfstate
-    secrets: inherit
+    secrets:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
   deploy-prod:
     needs: deploy-stg
@@ -69,4 +72,7 @@ jobs:
     with:
       environment: prod
       tfstate_key: app-prod.tfstate
-    secrets: inherit
+    secrets:
+      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
