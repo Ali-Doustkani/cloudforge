@@ -43,7 +43,6 @@ locals {
   workload            = "cloudforge"
   suffix              = substr(md5(data.azurerm_subscription.current.id), 0, 6)
   kv_suffix           = substr(md5(data.azurerm_subscription.current.id), 0, 5)
-  github_sp_object_id = data.azuread_service_principal.github.object_id
 }
 
 data "azurerm_client_config" "current" {}
@@ -163,13 +162,13 @@ resource "azurerm_role_assignment" "acr_pull" {
 resource "azurerm_role_assignment" "kv_secrets_officer" {
   scope                = azurerm_key_vault.main.id
   role_definition_name = "Key Vault Secrets Officer"
-  principal_id         = local.github_sp_object_id
+  principal_id         = data.azuread_service_principal.github.object_id
 }
 
 resource "azurerm_role_assignment" "app_config_data_owner" {
   scope                = azurerm_app_configuration.main.id
   role_definition_name = "App Configuration Data Owner"
-  principal_id         = local.github_sp_object_id
+  principal_id         = data.azuread_service_principal.github.object_id
 }
 
 # resource "azurerm_cosmosdb_sql_role_assignment" "db_contributor" {
