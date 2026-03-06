@@ -27,13 +27,13 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - run: terraform init -backend-config=../bootstrap/backend.hcl
       - uses: terraform-linters/setup-tflint@v4
       - run: tflint --init --config ../.tflint.hcl
       - run: tflint --config ../.tflint.hcl --force
+      - run: terraform init -backend=false
       - run: terraform validate
       - run: terraform test
-        working-directory: infra/platform
+      - run: terraform init -backend-config=../bootstrap/backend.hcl
       - run: terraform plan -var="ver=${{ github.sha }}" -out=tfplan
       - name: Warn on deletions
         run: |

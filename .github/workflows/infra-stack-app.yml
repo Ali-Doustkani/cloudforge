@@ -24,12 +24,13 @@ jobs:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - run: terraform init -backend-config=../bootstrap/backend.hcl -backend-config="key=app-stg.tfstate"
       - uses: terraform-linters/setup-tflint@v4
       - run: tflint --init --config ../.tflint.hcl
       - run: tflint --config ../.tflint.hcl --force
+      - run: terraform init -backend=false
       - run: terraform validate
-      - run: terraform test -var="ver=${{ github.sha }}" -var="environment=stg" -var="github_sp_client_id=${{ secrets.AZURE_CLIENT_ID }}"
+      - run: terraform test
+      - run: terraform init -backend-config=../bootstrap/backend.hcl -backend-config="key=app-stg.tfstate"
       - run: terraform plan -var="ver=${{ github.sha }}" -var="environment=stg" -var="github_sp_client_id=${{ secrets.AZURE_CLIENT_ID }}" -out=tfplan
       - name: Warn on deletions
         run: |
@@ -42,7 +43,6 @@ jobs:
       - run: terraform apply -auto-approve tfplan
       - name: Prepare test environment
         id: prepare_test_env
-        working-directory: ${{ github.workspace }}
         run: |
           acr_name=$(terraform output -raw acr_name)
           app_name=$(terraform output -raw app_service_name)
