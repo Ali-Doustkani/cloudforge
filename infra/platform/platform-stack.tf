@@ -24,14 +24,15 @@ locals {
   workload = "cloudforge"
   suffix   = substr(md5(data.azurerm_subscription.current.id), 0, 6)
   tags = {
-    workload = local.workload
-    type     = "platform"
-    version  = var.ver
+    workload    = local.workload
+    environment = "all"
+    type        = "platform"
+    version     = var.ver
   }
 }
 
 variable "ver" {
-  type = string
+  type        = string
   description = "version of the infrastructure. git sha."
 }
 
