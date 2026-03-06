@@ -113,7 +113,6 @@ jobs:
     needs: [plan-prod, approve-deletions-prod]
     if: always() && needs.plan-prod.result == 'success' && (needs.approve-deletions-prod.result == 'success' || needs.approve-deletions-prod.result == 'skipped')
     runs-on: ubuntu-latest
-    environment: prod
     env:
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
