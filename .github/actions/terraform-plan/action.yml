@@ -1,0 +1,80 @@
+name: Terraform Plan
+description: Lint, validate, test, init, plan, and deletion check for a Terraform stack
+
+inputs:
+  working-directory:
+    required: true
+  backend-key:
+    required: false
+    default: ''
+  plan-vars:
+    required: false
+    default: ''
+  lint:
+    required: false
+    default: 'true'
+  test:
+    required: false
+    default: 'true'
+
+outputs:
+  has_deletions:
+    value: ${{ steps.check_deletions.outputs.has_deletions }}
+
+runs:
+  using: composite
+  steps:
+    - uses: terraform-linters/setup-tflint@v4
+      if: inputs.lint == 'true'
+
+    - run: tflint --init --config ../.tflint.hcl
+      if: inputs.lint == 'true'
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+
+    - run: tflint --config ../.tflint.hcl --force
+      if: inputs.lint == 'true'
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+
+    - run: terraform init -backend=false
+      if: inputs.test == 'true'
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+
+    - run: terraform validate
+      if: inputs.test == 'true'
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+
+    - run: terraform test
+      if: inputs.test == 'true'
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+
+    - run: |
+        if [ -n "${{ inputs.backend-key }}" ]; then
+          terraform init -backend-config=../bootstrap/backend.hcl -backend-config="key=${{ inputs.backend-key }}"
+        else
+          terraform init -backend-config=../bootstrap/backend.hcl
+        fi
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+
+    - run: terraform plan ${{ inputs.plan-vars }} -out=tfplan
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+
+    - name: Check for deletions
+      id: check_deletions
+      run: |
+        deletes=$(terraform show -json tfplan | jq '[.resource_changes[]? | select(.change.actions[] == "delete")] | length')
+        if [ "$deletes" -gt 0 ]; then
+          echo "::warning::Terraform plan contains $deletes resource deletion(s). Review before merging."
+          echo "has_deletions=true" >> $GITHUB_OUTPUT
+        else
+          echo "::notice::No resource deletions in this plan."
+          echo "has_deletions=false" >> $GITHUB_OUTPUT
+        fi
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
