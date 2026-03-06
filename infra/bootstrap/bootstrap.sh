@@ -17,7 +17,8 @@ if ! az group show --name "$RESOURCE_GROUP" &>/dev/null; then
   echo "Creating resource group '$RESOURCE_GROUP' in '$LOCATION'..."
   az group create \
     --name "$RESOURCE_GROUP" \
-    --location "$LOCATION"
+    --location "$LOCATION" \
+    --tags workload=bootstrap environment=bootstrap
 else
   echo "Resource group '$RESOURCE_GROUP' already exists, skipping."
 fi
@@ -33,7 +34,7 @@ if ! az storage account show --name "$STORAGE_ACCOUNT" --resource-group "$RESOUR
     --kind StorageV2 \
     --allow-blob-public-access false \
     --min-tls-version TLS1_2 \
-    --tags type=terraform-backend
+    --tags workload=bootstrap environment=bootstrap type=terraform-backend
 else
   echo "Storage account '$STORAGE_ACCOUNT' already exists, skipping."
 fi
