@@ -1,10 +1,12 @@
 mock_provider "azurerm" {}
+mock_provider "azuread" {}
 
 override_data {
   target = data.terraform_remote_state.platform
   values = {
     outputs = {
-      acr_name = "crplatformabcdef"
+      acr_name            = "crplatformabcdef"
+      resource_group_name = "rg-platform"
     }
   }
 }
@@ -25,8 +27,9 @@ override_data {
 }
 
 variables {
-  ver         = "test"
-  environment = "stg"
+  ver                 = "test"
+  environment         = "stg"
+  github_sp_client_id = "00000000-0000-0000-0000-000000000000"
 }
 
 run "resource_group" {

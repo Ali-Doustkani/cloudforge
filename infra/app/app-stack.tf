@@ -5,6 +5,10 @@ terraform {
       source  = "hashicorp/azurerm"
       version = "~> 4.61"
     }
+    azuread = {
+      source  = "hashicorp/azuread"
+      version = "~> 3.0"
+    }
   }
   backend "azurerm" {
     resource_group_name = "rg-bootstrap"
@@ -30,11 +34,16 @@ variable "environment" {
   }
 }
 
+variable "github_sp_client_id" {
+  type        = string
+  description = "client_id of the SP used for role assignment"
+}
+
 locals {
   workload            = "cloudforge"
   suffix              = substr(md5(data.azurerm_subscription.current.id), 0, 6)
   kv_suffix           = substr(md5(data.azurerm_subscription.current.id), 0, 5)
-  github_sp_object_id = "2aa460f0-b63a-465d-8d73-a2662efc80e2"
+  github_sp_object_id = data.azuread_service_principal.github.object_id
 }
 
 data "azurerm_client_config" "current" {}
@@ -54,6 +63,10 @@ data "terraform_remote_state" "platform" {
 data "azurerm_container_registry" "acr" {
   name                = data.terraform_remote_state.platform.outputs.acr_name
   resource_group_name = data.terraform_remote_state.platform.outputs.resource_group_name
+}
+
+data "azuread_service_principal" "github" {
+  client_id = var.github_sp_client_id
 }
 
 resource "azurerm_resource_group" "app" {

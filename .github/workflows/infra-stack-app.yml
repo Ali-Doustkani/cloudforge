@@ -29,9 +29,8 @@ jobs:
       - run: tflint --init --config ../.tflint.hcl
       - run: tflint --config ../.tflint.hcl --force
       - run: terraform validate
-      - run: terraform test -var="ver=${{ github.sha }}" -var="environment=stg"
-        working-directory: infra/app
-      - run: terraform plan -var="ver=${{ github.sha }}" -var="environment=stg" -out=tfplan
+      - run: terraform test -var="ver=${{ github.sha }}" -var="environment=stg" -var="github_sp_client_id=${{ secrets.AZURE_CLIENT_ID }}"
+      - run: terraform plan -var="ver=${{ github.sha }}" -var="environment=stg" -var="github_sp_client_id=${{ secrets.AZURE_CLIENT_ID }}" -out=tfplan
       - name: Warn on deletions
         run: |
           deletes=$(terraform show -json tfplan | jq '[.resource_changes[]? | select(.change.actions[] == "delete")] | length')
@@ -100,7 +99,7 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       - run: terraform init -backend-config=../bootstrap/backend.hcl -backend-config="key=app-prod.tfstate"
-      - run: terraform plan -var="ver=${{ github.sha }}" -var="environment=prod" -out=tfplan
+      - run: terraform plan -var="ver=${{ github.sha }}" -var="environment=prod" -var="github_sp_client_id=${{ secrets.AZURE_CLIENT_ID }}" -out=tfplan
       - name: Check for deletions
         id: check_deletions
         run: |
