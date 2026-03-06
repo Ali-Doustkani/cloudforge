@@ -103,6 +103,12 @@ resource "azurerm_linux_web_app" "main" {
     }
   }
 
+  # docker_image_name is managed out-of-band by the deploy pipeline
+  # Terraform provisions the resource but does not own the image tag at runtime.
+  lifecycle {
+    ignore_changes = [site_config[0].application_stack]
+  }
+
   app_settings = {
     APP_CONFIG_ENDPOINT = azurerm_app_configuration.main.endpoint
     KV_ENDPOINT         = azurerm_key_vault.main.vault_uri
