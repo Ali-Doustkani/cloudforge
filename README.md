@@ -1,28 +1,39 @@
 # Architecture
+
+Two Terraform stacks are deployed independently.
+
 ``` mermaid
 flowchart LR
-    subgraph rg[Resource Group: rg]
+    subgraph platform[Platform Stack: rg-platform]
+      ACR["`Azure Container Registry
+      Tier: Basic`"]
+    end
+
+    subgraph app[App Stack: rg-cloudforge-{env}]
       AppServicePlan["`App Service Plan
       OS: Linux
       Tier: B1`"]
-      AppService[App Service]
-      ACR["`Azure Container Registry
-      Tier: Basic`"]
-      AppConfig[App Configuration]
-    end 
+      AppService["`App Service
+      SystemAssigned Identity`"]
+      AppConfig["`App Configuration
+      Tier: Free`"]
+      KeyVault["`Key Vault
+      Tier: Standard`"]
+    end
 
     AppService --> AppServicePlan
-    AppService -- uami --> ACR
-    AppService -- uami --> AppConfig
-
+    AppService -- AcrPull --> ACR
+    AppService -- Data Reader --> AppConfig
+    AppService -- Secrets User --> KeyVault
 ```
+
 # Testing
-1. Infrastrcuture is installed with IaC with a pipeline
+1. Infrastructure is deployed with IaC via a pipeline.
 2. A default docker image is used for testing after infrastructure deployment.
 3. todo: Accessibility of App Service to App Configuration is tested via ssh.
 
 # Tooling
-- Infrastructure Deployment: Bicep
+- Infrastructure Deployment: Terraform
 - App Deployment: Github Actions
 
 
@@ -43,7 +54,11 @@ az acr login -n myacr.azurecr.io
 
 **To deploy your IaC into Azure:**
 ``` sh
-az deployment group create -g rg --template-file ./infra/infra.bicep
+terraform -chdir=infra/platform init -backend-config="storage_account_name=<storage_account>"
+terraform -chdir=infra/platform apply
+
+terraform -chdir=infra/app init -backend-config="storage_account_name=<storage_account>"
+terraform -chdir=infra/app apply -var="environment=stg" -var="ver=<git_sha>" -var="github_sp_client_id=<client_id>"
 ```
 
 **To integrate github with azure:**
@@ -78,7 +93,7 @@ The service principal might not have enough permissions to do things (role assig
 ``` json
 {
   "access_token": "...",  <- JWT token (header.payload.signature)
-  "token_type": "Bearer", 
+  "token_type": "Bearer",
   "expires_on": "1765797550"
 }
 ```
@@ -87,4 +102,4 @@ The service principal might not have enough permissions to do things (role assig
 
 **SSH to App Service with Containers**
 
-There are conventions defined by Microsoft you have to follow to allow `az webapp ssh` to work. 
+There are conventions defined by Microsoft you have to follow to allow `az webapp ssh` to work.
