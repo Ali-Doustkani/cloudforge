@@ -21,7 +21,13 @@ provider "azurerm" {
 data "azurerm_subscription" "current" {}
 
 locals {
-  suffix = substr(md5(data.azurerm_subscription.current.id), 0, 6)
+  workload = "cloudforge"
+  suffix   = substr(md5(data.azurerm_subscription.current.id), 0, 6)
+  tags = {
+    workload = local.workload
+    type     = "platform"
+    version  = var.ver
+  }
 }
 
 variable "ver" {
@@ -32,18 +38,15 @@ variable "ver" {
 resource "azurerm_resource_group" "main" {
   name     = "rg-platform"
   location = "austriaeast"
-  tags = {
-    type    = "platform"
-    version = var.ver
-  }
+  tags     = local.tags
 }
 
 resource "azurerm_container_registry" "acr" {
   name                = "crplatform${local.suffix}"
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
-
-  sku = "Basic"
+  sku                 = "Basic"
+  tags                = local.tags
 }
 
 output "acr_name" {

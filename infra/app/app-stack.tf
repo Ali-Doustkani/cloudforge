@@ -40,9 +40,15 @@ variable "github_sp_client_id" {
 }
 
 locals {
-  workload            = "cloudforge"
-  suffix              = substr(md5(data.azurerm_subscription.current.id), 0, 6)
-  kv_suffix           = substr(md5(data.azurerm_subscription.current.id), 0, 5)
+  workload  = "cloudforge"
+  suffix    = substr(md5(data.azurerm_subscription.current.id), 0, 6)
+  kv_suffix = substr(md5(data.azurerm_subscription.current.id), 0, 5)
+  tags = {
+    workload    = local.workload
+    environment = var.environment
+    type        = "app"
+    version     = var.ver
+  }
 }
 
 data "azurerm_client_config" "current" {}
@@ -71,10 +77,7 @@ data "azuread_service_principal" "github" {
 resource "azurerm_resource_group" "app" {
   name     = "rg-${local.workload}-${var.environment}"
   location = "austriaeast"
-  tags = {
-    type    = "app"
-    version = var.ver
-  }
+  tags     = local.tags
 }
 
 resource "azurerm_service_plan" "main" {
@@ -83,6 +86,7 @@ resource "azurerm_service_plan" "main" {
   resource_group_name = azurerm_resource_group.app.name
   os_type             = "Linux"
   sku_name            = "B1"
+  tags                = local.tags
 }
 
 resource "azurerm_linux_web_app" "main" {
@@ -113,6 +117,8 @@ resource "azurerm_linux_web_app" "main" {
     APP_CONFIG_ENDPOINT = azurerm_app_configuration.main.endpoint
     KV_ENDPOINT         = azurerm_key_vault.main.vault_uri
   }
+
+  tags = local.tags
 }
 
 resource "azurerm_app_configuration" "main" {
@@ -120,6 +126,7 @@ resource "azurerm_app_configuration" "main" {
   location            = azurerm_resource_group.app.location
   resource_group_name = azurerm_resource_group.app.name
   sku                 = "free"
+  tags                = local.tags
 }
 
 resource "azurerm_key_vault" "main" {
@@ -129,6 +136,7 @@ resource "azurerm_key_vault" "main" {
   tenant_id                  = data.azurerm_client_config.current.tenant_id
   sku_name                   = "standard"
   rbac_authorization_enabled = true
+  tags                       = local.tags
 }
 
 # resource "azurerm_cosmosdb_account" "db" {
