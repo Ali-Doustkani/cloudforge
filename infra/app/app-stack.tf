@@ -139,22 +139,6 @@ resource "azurerm_key_vault" "main" {
   tags                       = local.tags
 }
 
-# resource "azurerm_cosmosdb_account" "db" {
-#   name                          = "cosmos-${local.workload}-${var.environment}"
-#   location                      = azurerm_resource_group.app.location
-#   resource_group_name           = azurerm_resource_group.app.name
-#   free_tier_enabled             = true
-#   offer_type                    = "Standard"
-#   local_authentication_disabled = true
-#   consistency_policy {
-#     consistency_level = "Session"
-#   }
-#   geo_location {
-#     location          = azurerm_resource_group.app.location
-#     failover_priority = 0
-#   }
-# }
-
 resource "azurerm_role_assignment" "app_config_reader" {
   scope                = azurerm_app_configuration.main.id
   role_definition_name = "App Configuration Data Reader"
@@ -184,14 +168,6 @@ resource "azurerm_role_assignment" "app_config_data_owner" {
   role_definition_name = "App Configuration Data Owner"
   principal_id         = data.azuread_service_principal.github.object_id
 }
-
-# resource "azurerm_cosmosdb_sql_role_assignment" "db_contributor" {
-#   resource_group_name = azurerm_resource_group.app.name
-#   account_name        = azurerm_cosmosdb_account.db.name
-#   role_definition_id  = "${azurerm_cosmosdb_account.db.id}/sqlRoleDefinitions/00000000-0000-0000-0000-000000000002"
-#   principal_id        = azurerm_linux_web_app.main.identity[0].principal_id
-#   scope               = azurerm_cosmosdb_account.db.id
-# }
 
 output "acr_name" {
   value = data.azurerm_container_registry.acr.name
