@@ -41,7 +41,6 @@ variable "github_sp_client_id" {
 
 locals {
   workload  = "cloudforge"
-  suffix    = substr(md5(data.azurerm_subscription.current.id), 0, 6)
   kv_suffix = substr(md5(data.azurerm_subscription.current.id), 0, 5)
   tags = {
     workload    = local.workload
