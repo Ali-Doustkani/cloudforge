@@ -114,8 +114,9 @@ resource "azurerm_linux_web_app" "main" {
   }
 
   app_settings = {
-    APP_CONFIG_ENDPOINT = azurerm_app_configuration.main.endpoint
-    KV_ENDPOINT         = azurerm_key_vault.main.vault_uri
+    APP_CONFIG_ENDPOINT    = azurerm_app_configuration.main.endpoint
+    KV_ENDPOINT            = azurerm_key_vault.main.vault_uri
+    ASPNETCORE_ENVIRONMENT = var.environment == "stg" ? "Staging" : "Production"
   }
 
   tags = local.tags

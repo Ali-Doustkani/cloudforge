@@ -62,6 +62,24 @@ run "web_app" {
     condition     = azurerm_linux_web_app.main.site_config[0].container_registry_use_managed_identity == true
     error_message = "Web App must access ACR via managed identity"
   }
+
+  assert {
+    condition     = azurerm_linux_web_app.main.app_settings["ASPNETCORE_ENVIRONMENT"] == "Staging"
+    error_message = "ASPNETCORE_ENVIRONMENT must be 'Staging' for stg environment"
+  }
+}
+
+run "web_app_prod_environment" {
+  command = plan
+
+  variables {
+    environment = "prod"
+  }
+
+  assert {
+    condition     = azurerm_linux_web_app.main.app_settings["ASPNETCORE_ENVIRONMENT"] == "Production"
+    error_message = "ASPNETCORE_ENVIRONMENT must be 'Production' for prod environment"
+  }
 }
 
 run "key_vault" {
