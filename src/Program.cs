@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // builder.Configuration.AddAzureAppConfiguration(options =>
 // {
-//     options.Connect(new Uri(builder.Configuration["APP_CONFIG_ENDPOINT"]), new ManagedIdentityCredential())
+//     options.Connect(new Uri(builder.Configuration["APP_CONFIG_ENDPOINT"]!), new ManagedIdentityCredential(ManagedIdentityId.SystemAssigned))
 //         .Select(KeyFilter.Any, labelFilter: builder.Environment.EnvironmentName.ToLower());
 // });
 
