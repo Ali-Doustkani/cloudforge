@@ -1,11 +1,17 @@
 using app.Components;
+using Azure.Identity;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+// builder.Configuration.AddAzureAppConfiguration(options =>
+// {
+//     options.Connect(new Uri(builder.Configuration["APP_CONFIG_ENDPOINT"]), new ManagedIdentityCredential())
+//         .Select(KeyFilter.Any, labelFilter: builder.Environment.EnvironmentName.ToLower());
+// });
 
+builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+// builder.Services.Configure<EnvironmentBannerOption>(builder.Configuration.GetSection("UI:EnvironmentBanner"));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

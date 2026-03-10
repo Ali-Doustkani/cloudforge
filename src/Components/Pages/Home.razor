@@ -1,9 +1,18 @@
 ﻿@page "/"
+@using Microsoft.Extensions.Options
+@inject IOptions<EnvironmentBannerOption> Options;
+@inject IWebHostEnvironment environment;
 
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>
+<h2>@Options.Value.Message</h2>
 
 Welcome to your new app.
 
-Version: 0.0.4
+<div>
+    Environment: @environment.EnvironmentName
+</div>
+<div>
+    Version: 0.0.4
+</div>
