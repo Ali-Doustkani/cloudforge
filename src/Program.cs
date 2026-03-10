@@ -4,14 +4,16 @@ using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// builder.Configuration.AddAzureAppConfiguration(options =>
-// {
-//     options.Connect(new Uri(builder.Configuration["APP_CONFIG_ENDPOINT"]!), new ManagedIdentityCredential(ManagedIdentityId.SystemAssigned))
-//         .Select(KeyFilter.Any, labelFilter: builder.Environment.EnvironmentName.ToLower());
-// });
+builder.Configuration.AddAzureAppConfiguration(options =>
+{
+    options.Connect(new Uri(builder.Configuration["APP_CONFIG_ENDPOINT"] ?? throw new InvalidOperationException("this env var is required")), new DefaultAzureCredential())
+        .Select(KeyFilter.Any, labelFilter: "EN");
+});
 
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
-// builder.Services.Configure<EnvironmentBannerOption>(builder.Configuration.GetSection("UI:EnvironmentBanner"));
+builder.Services.Configure<UiOption>(builder.Configuration.GetSection("UI"));
+builder.Services.AddOptionsWithValidateOnStart<UiOption>().ValidateDataAnnotations();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

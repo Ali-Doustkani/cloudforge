@@ -130,6 +130,20 @@ resource "azurerm_app_configuration" "main" {
   tags                = local.tags
 }
 
+resource "azurerm_app_configuration_key" "appname_en" {
+  configuration_store_id = azurerm_app_configuration.main.id
+  key                    = "UI:AppName"
+  label                  = "EN"
+  value                  = "Cloudforge"
+}
+
+resource "azurerm_app_configuration_key" "appname_de" {
+  configuration_store_id = azurerm_app_configuration.main.id
+  key                    = "UI:AppName"
+  label                  = "DE"
+  value                  = "Cloudförge"
+}
+
 resource "azurerm_key_vault" "main" {
   name                       = "kv-${local.workload}-${var.environment}-${local.kv_suffix}"
   location                   = azurerm_resource_group.app.location

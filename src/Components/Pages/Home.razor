@@ -1,12 +1,12 @@
 ﻿@page "/"
 @using Microsoft.Extensions.Options
-@inject IOptions<EnvironmentBannerOption> Options;
+@inject IOptions<UiOption> Options;
 @inject IWebHostEnvironment environment;
 
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>
-<h2>@Options.Value.Message</h2>
+<h2>Name: @Options.Value.AppName</h2>
 
 Welcome to your new app.
 
