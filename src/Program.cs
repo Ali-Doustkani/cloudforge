@@ -1,15 +1,19 @@
 using app.Components;
 using Azure.Identity;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
+using Microsoft.FeatureManagement;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddAzureAppConfiguration(options =>
 {
     options.Connect(new Uri(builder.Configuration["APP_CONFIG_ENDPOINT"] ?? throw new InvalidOperationException("this env var is required")), new DefaultAzureCredential())
-        .Select(KeyFilter.Any, labelFilter: "EN");
+        .Select(KeyFilter.Any, labelFilter: "EN")
+        .UseFeatureFlags(x => x.CacheExpirationInterval = TimeSpan.FromSeconds(10));
 });
 
+builder.Services.AddAzureAppConfiguration();
+builder.Services.AddFeatureManagement();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.Configure<UiOption>(builder.Configuration.GetSection("UI"));
 builder.Services.AddOptionsWithValidateOnStart<UiOption>().ValidateDataAnnotations();
@@ -26,7 +30,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-
+app.UseAzureAppConfiguration();
 app.UseAntiforgery();
 
 app.MapStaticAssets();

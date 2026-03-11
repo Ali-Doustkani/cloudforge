@@ -1,4 +1,6 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+@inject IFeatureManager FeatureManager
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">app</a>
     </div>
@@ -20,11 +22,22 @@
             </NavLink>
         </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
+        @if (_showWeather)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="weather">
+                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+                </NavLink>
+            </div>
+        }
     </nav>
 </div>
 
+@code {
+    private bool _showWeather;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _showWeather = await FeatureManager.IsEnabledAsync("enable_weather");
+    }
+}
