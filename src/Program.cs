@@ -1,3 +1,4 @@
+using app;
 using app.Components;
 using Azure.Identity;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
