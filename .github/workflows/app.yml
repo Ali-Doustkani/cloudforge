@@ -12,16 +12,7 @@ permissions:
   id-token: write
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Test
-        run: dotnet test src/app.sln
-
   build:
-    needs: test
     runs-on: ubuntu-latest
     environment: stg
     env:
@@ -32,6 +23,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Test
+        run: dotnet test src/app.sln
       - name: Azure Login
         uses: azure/login@v2
         with:
