@@ -9,11 +9,12 @@ builder.Configuration.AddAzureAppConfiguration(options =>
 {
     options.Connect(new Uri(builder.Configuration["APP_CONFIG_ENDPOINT"] ?? throw new InvalidOperationException("this env var is required")), new DefaultAzureCredential())
         .Select(KeyFilter.Any, labelFilter: "EN")
-        .UseFeatureFlags(x => x.CacheExpirationInterval = TimeSpan.FromSeconds(10));
+        .UseFeatureFlags(x => x.SetRefreshInterval(TimeSpan.FromSeconds(10)));
 });
 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddAzureAppConfiguration();
-builder.Services.AddFeatureManagement();
+builder.Services.AddFeatureManagement().WithTargeting<TargetingContextAccessor>();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.Configure<UiOption>(builder.Configuration.GetSection("UI"));
 builder.Services.AddOptionsWithValidateOnStart<UiOption>().ValidateDataAnnotations();
