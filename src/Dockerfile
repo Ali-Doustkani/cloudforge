@@ -3,7 +3,7 @@ WORKDIR /src
 COPY app.csproj .
 RUN dotnet restore 
 COPY . .
-RUN dotnet publish --output /app --configuration Release
+RUN dotnet publish app.csproj --output /app --configuration Release
 
 FROM mcr.microsoft.com/dotnet/aspnet@sha256:9f5100cdf26f7679ccf40dba48af9062a43e5ba0b243e80b324e8591f247b092
 WORKDIR /app
