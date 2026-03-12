@@ -144,7 +144,7 @@ jobs:
             az appconfig snapshot create \
               --snapshot-name "$current_ver" \
               --name appcs-cloudforge-prod \
-              --filters '[{"key": "*"}]'
+              --filters '{"key": "*"}'
             echo "Snapshot created: $current_ver"
           else
             echo "No existing prod version found, skipping snapshot"
