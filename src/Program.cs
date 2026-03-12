@@ -1,6 +1,7 @@
 using app;
 using app.Components;
 using Azure.Identity;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.FeatureManagement;
 
@@ -16,6 +17,8 @@ builder.Configuration.AddAzureAppConfiguration(options =>
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAzureAppConfiguration();
 builder.Services.AddFeatureManagement().WithTargeting<TargetingContextAccessor>();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
+builder.Services.AddRazorPages();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.Configure<UiOption>(builder.Configuration.GetSection("UI"));
 builder.Services.AddOptionsWithValidateOnStart<UiOption>().ValidateDataAnnotations();
@@ -33,7 +36,10 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAzureAppConfiguration();
+app.UseAuthentication();
 app.UseAntiforgery();
+
+app.MapRazorPages();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
