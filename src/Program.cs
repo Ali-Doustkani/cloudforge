@@ -17,6 +17,7 @@ builder.Configuration.AddAzureAppConfiguration(options =>
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAzureAppConfiguration();
 builder.Services.AddFeatureManagement().WithTargeting<TargetingContextAccessor>();
+builder.Services.AddScoped<IIncrementProvider, VariantIncrementProvider>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
 builder.Services.AddRazorPages();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
