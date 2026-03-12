@@ -137,4 +137,16 @@ jobs:
         with:
           name: tfplan-prod
           path: infra/app
+      - name: Snapshot app config before deploy
+        run: |
+          current_ver=$(az group show --name rg-cloudforge-prod --query "tags.version" -o tsv 2>/dev/null || echo "")
+          if [ -n "$current_ver" ]; then
+            az appconfig snapshot create \
+              --name "$current_ver" \
+              --appconfig-name appcs-cloudforge-prod \
+              --filters '[{"key": "*"}]'
+            echo "Snapshot created: $current_ver"
+          else
+            echo "No existing prod version found, skipping snapshot"
+          fi
       - run: terraform apply -auto-approve tfplan
