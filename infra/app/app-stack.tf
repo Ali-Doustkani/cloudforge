@@ -143,6 +143,12 @@ resource "azurerm_app_configuration_key" "appname_de" {
   value                  = "Cloudförge"
 }
 
+resource "azurerm_app_configuration_key" "sentinel" {
+  configuration_store_id = azurerm_app_configuration.main.id
+  key                    = "App:ConfigVersion"
+  value                  = "1"
+}
+
 resource "azurerm_key_vault" "main" {
   name                       = "kv-${local.workload}-${var.environment}-${local.kv_suffix}"
   location                   = azurerm_resource_group.app.location

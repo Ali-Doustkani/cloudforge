@@ -103,6 +103,11 @@ run "app_config" {
     condition     = azurerm_app_configuration.main.sku == "free"
     error_message = "App Configuration SKU must be 'free'"
   }
+
+  assert {
+    condition     = azurerm_app_configuration_key.sentinel.key == "App:ConfigVersion"
+    error_message = "Sentinel key must be 'App:ConfigVersion'"
+  }
 }
 
 # run "cosmos_db" {
