@@ -11,7 +11,9 @@ builder.Configuration.AddAzureAppConfiguration(options =>
 {
     options.Connect(new Uri(builder.Configuration["APP_CONFIG_ENDPOINT"] ?? throw new InvalidOperationException("this env var is required")), new DefaultAzureCredential())
         .Select(KeyFilter.Any, labelFilter: "EN")
-        .UseFeatureFlags(x => x.SetRefreshInterval(TimeSpan.FromSeconds(10)));
+        .UseFeatureFlags(x => x.SetRefreshInterval(TimeSpan.FromSeconds(10)))
+        .ConfigureRefresh(r => r.Register("App:ConfigVersion", refreshAll: true)
+                                .SetRefreshInterval(TimeSpan.FromSeconds(10)));
 });
 
 builder.Services.AddHttpContextAccessor();
