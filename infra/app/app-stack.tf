@@ -125,7 +125,7 @@ resource "azurerm_app_configuration" "main" {
   name                = "appcs-${local.workload}-${var.environment}"
   location            = azurerm_resource_group.app.location
   resource_group_name = azurerm_resource_group.app.name
-  sku                 = "free"
+  sku                 = "standard"
   tags                = local.tags
 }
 
