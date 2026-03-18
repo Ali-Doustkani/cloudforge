@@ -100,8 +100,8 @@ run "app_config" {
   command = plan
 
   assert {
-    condition     = azurerm_app_configuration.main.sku == "standard"
-    error_message = "App Configuration SKU must be 'standard'"
+    condition     = azurerm_app_configuration.main.sku == "developer"
+    error_message = "App Configuration SKU must be 'developer'"
   }
 
   assert {
