@@ -9,11 +9,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddAzureAppConfiguration(options =>
 {
-    options.Connect(new Uri(builder.Configuration["APP_CONFIG_ENDPOINT"] ?? throw new InvalidOperationException("this env var is required")), new DefaultAzureCredential())
+    var credential = new DefaultAzureCredential();
+    options.Connect(new Uri(builder.Configuration["APP_CONFIG_ENDPOINT"] ?? throw new InvalidOperationException("this env var is required")), credential)
         .Select(KeyFilter.Any, labelFilter: "EN")
+        .Select(KeyFilter.Any, labelFilter: LabelFilter.Null)
         .UseFeatureFlags(x => x.SetRefreshInterval(TimeSpan.FromSeconds(10)))
         .ConfigureRefresh(r => r.Register("App:ConfigVersion", refreshAll: true)
-                                .SetRefreshInterval(TimeSpan.FromSeconds(10)));
+                                .SetRefreshInterval(TimeSpan.FromSeconds(10)))
+        .ConfigureKeyVault(kv => kv.SetCredential(credential));
 });
 
 builder.Services.AddHttpContextAccessor();
@@ -25,6 +28,8 @@ builder.Services.AddRazorPages();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.Configure<UiOption>(builder.Configuration.GetSection("UI"));
 builder.Services.AddOptionsWithValidateOnStart<UiOption>().ValidateDataAnnotations();
+builder.Services.Configure<AppOption>(builder.Configuration.GetSection("App"));
+builder.Services.AddOptionsWithValidateOnStart<AppOption>().ValidateDataAnnotations();
 
 var app = builder.Build();
 

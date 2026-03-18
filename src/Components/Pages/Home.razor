@@ -2,6 +2,7 @@
 @using Microsoft.Extensions.Options
 @using Microsoft.AspNetCore.Components.Authorization
 @inject IOptionsSnapshot<UiOption> Options;
+@inject IOptionsSnapshot<AppOption> AppOptions;
 @inject IWebHostEnvironment environment;
 @inject AuthenticationStateProvider AuthenticationStateProvider;
 
@@ -17,6 +18,9 @@ Welcome to your new app.
 </div>
 <div>
     Version: 0.0.4
+</div>
+<div>
+    Secret: @AppOptions.Value.Secret
 </div>
 
 @code {
