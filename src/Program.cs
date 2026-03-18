@@ -26,8 +26,6 @@ builder.Services.AddScoped<IIncrementProvider, VariantIncrementProvider>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
 builder.Services.AddRazorPages();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
-builder.Services.Configure<UiOption>(builder.Configuration.GetSection("UI"));
-builder.Services.AddOptionsWithValidateOnStart<UiOption>().ValidateDataAnnotations();
 builder.Services.Configure<AppOption>(builder.Configuration.GetSection("App"));
 builder.Services.AddOptionsWithValidateOnStart<AppOption>().ValidateDataAnnotations();
 

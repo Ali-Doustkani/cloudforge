@@ -1,7 +1,5 @@
 ﻿@page "/"
-@using Microsoft.Extensions.Options
 @using Microsoft.AspNetCore.Components.Authorization
-@inject IOptionsSnapshot<UiOption> Options;
 @inject IOptionsSnapshot<AppOption> AppOptions;
 @inject IWebHostEnvironment environment;
 @inject AuthenticationStateProvider AuthenticationStateProvider;
@@ -9,7 +7,6 @@
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, @userName!</h1>
-<h2>Name: @Options.Value.AppName</h2>
 
 Welcome to your new app.
 
