@@ -129,12 +129,6 @@ resource "azurerm_app_configuration" "main" {
   tags                = local.tags
 }
 
-resource "azurerm_app_configuration_key" "sentinel" {
-  configuration_store_id = azurerm_app_configuration.main.id
-  key                    = "App:ConfigVersion"
-  value                  = "1"
-}
-
 resource "azurerm_app_configuration_key" "infra_default" {
   configuration_store_id = azurerm_app_configuration.main.id
   key                    = "infra_default"
@@ -164,14 +158,6 @@ resource "azurerm_key_vault_secret" "app_secret" {
   value        = "hello-from-key-vault"
   key_vault_id = azurerm_key_vault.main.id
   depends_on   = [azurerm_role_assignment.kv_secrets_officer]
-}
-
-resource "azurerm_app_configuration_key" "app_secret_ref" {
-  configuration_store_id = azurerm_app_configuration.main.id
-  key                    = "App:Secret"
-  type                   = "vault"
-  vault_key_reference    = azurerm_key_vault_secret.app_secret.versionless_id
-  depends_on             = [azurerm_role_assignment.app_config_data_owner]
 }
 
 resource "azurerm_role_assignment" "app_config_reader" {
