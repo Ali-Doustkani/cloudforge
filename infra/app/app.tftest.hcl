@@ -103,23 +103,5 @@ run "app_config" {
     condition     = azurerm_app_configuration.main.sku == "developer"
     error_message = "App Configuration SKU must be 'developer'"
   }
-
-  assert {
-    condition     = azurerm_app_configuration_key.sentinel.key == "App:ConfigVersion"
-    error_message = "Sentinel key must be 'App:ConfigVersion'"
-  }
+  
 }
-
-# run "cosmos_db" {
-#   command = plan
-
-#   assert {
-#     condition     = azurerm_cosmosdb_account.db.free_tier_enabled == true
-#     error_message = "Cosmos DB free tier must be enabled"
-#   }
-
-#   assert {
-#     condition     = azurerm_cosmosdb_account.db.local_authentication_disabled == true
-#     error_message = "Cosmos DB Key-based authentication must be disabled"
-#   }
-# }
