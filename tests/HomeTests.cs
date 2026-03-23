@@ -15,8 +15,8 @@ public class HomeTests : BunitContext
 {
     private void SetupDependencies(string secret = "test-secret")
     {
-        var uiOptions = new Mock<IOptionsSnapshot<UiOption>>();
-        uiOptions.Setup(o => o.Value).Returns(new UiOption { AppName = "TestApp" });
+        var uiOptions = new Mock<IOptionsSnapshot<AppOption>>();
+        uiOptions.Setup(o => o.Value).Returns(new AppOption { Secret = "TestApp" });
         Services.AddSingleton(uiOptions.Object);
 
         var appOptions = new Mock<IOptionsSnapshot<AppOption>>();
