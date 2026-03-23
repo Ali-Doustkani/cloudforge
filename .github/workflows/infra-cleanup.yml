@@ -23,3 +23,10 @@ jobs:
               echo "Deleting resource group: $rg"
               az group delete --name "$rg" --yes
           done
+      - name: Purge Soft-Deleted Key Vaults
+        run: |
+          az keyvault list-deleted --resource-type vault \
+            --query "[].name" -o tsv | while read -r name; do
+              echo "Purging soft-deleted Key Vault: $name"
+              az keyvault purge --name "$name" || true
+            done
