@@ -3,5 +3,5 @@ using System.ComponentModel.DataAnnotations;
 public class AppOption
 {
     [Required]
-    public required string Secret { get; set; }
+    public required string Secret { get; init; }
 }

@@ -1,7 +1,8 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.Extensions.Options
 @inject IOptionsSnapshot<AppOption> AppOptions;
-@inject IWebHostEnvironment environment;
+@inject IWebHostEnvironment Environment;
 @inject AuthenticationStateProvider AuthenticationStateProvider;
 
 <PageTitle>Home</PageTitle>
@@ -11,7 +12,7 @@
 Welcome to your new app.
 
 <div>
-    Environment: @environment.EnvironmentName
+    Environment: @Environment.EnvironmentName
 </div>
 <div>
     Version: 0.0.4
