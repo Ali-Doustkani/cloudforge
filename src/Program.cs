@@ -27,7 +27,6 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 builder.Services.AddRazorPages();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 builder.Services.Configure<AppOption>(builder.Configuration.GetSection("App"));
-builder.Services.AddOptionsWithValidateOnStart<AppOption>().ValidateDataAnnotations();
 
 var app = builder.Build();
 
