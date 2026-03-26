@@ -79,6 +79,36 @@ resource "azurerm_resource_group" "app" {
   tags     = local.tags
 }
 
+resource "azurerm_virtual_network" "main" {
+  name                = "vnet-${local.workload}-${var.environment}"
+  location            = azurerm_resource_group.app.location
+  resource_group_name = azurerm_resource_group.app.name
+  address_space       = ["10.0.0.0/16"]
+  tags                = local.tags
+}
+
+resource "azurerm_subnet" "app_service" {
+  name                 = "snet-appservice"
+  resource_group_name  = azurerm_resource_group.app.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes     = ["10.0.1.0/24"]
+
+  delegation {
+    name = "app-service-delegation"
+    service_delegation {
+      name    = "Microsoft.Web/serverFarms"
+      actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
+    }
+  }
+}
+
+resource "azurerm_subnet" "private_endpoints" {
+  name                 = "snet-privateendpoints"
+  resource_group_name  = azurerm_resource_group.app.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes     = ["10.0.2.0/24"]
+}
+
 resource "azurerm_service_plan" "main" {
   name                = "asp-${local.workload}-${var.environment}"
   location            = azurerm_resource_group.app.location
@@ -121,13 +151,54 @@ resource "azurerm_linux_web_app" "main" {
   tags = local.tags
 }
 
+resource "azurerm_app_service_virtual_network_swift_connection" "main" {
+  app_service_id = azurerm_linux_web_app.main.id
+  subnet_id      = azurerm_subnet.app_service.id
+}
+
 resource "azurerm_app_configuration" "main" {
-  name                = "appcs-${local.workload}-${var.environment}"
+  name                       = "appcs-${local.workload}-${var.environment}"
+  location                   = azurerm_resource_group.app.location
+  resource_group_name        = azurerm_resource_group.app.name
+  sku                        = "standard"
+  local_auth_enabled         = false
+  public_network_access      = "Disabled"
+  tags                       = local.tags
+}
+
+resource "azurerm_private_endpoint" "app_config" {
+  name                = "pe-appcs-${local.workload}-${var.environment}"
   location            = azurerm_resource_group.app.location
   resource_group_name = azurerm_resource_group.app.name
-  sku                 = "developer"
-  local_auth_enabled  = false
+  subnet_id           = azurerm_subnet.private_endpoints.id
+
+  private_service_connection {
+    name                           = "psc-appcs-${local.workload}-${var.environment}"
+    private_connection_resource_id = azurerm_app_configuration.main.id
+    subresource_names              = ["configurationStores"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = "appcs-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.app_config.id]
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_private_dns_zone" "app_config" {
+  name                = "privatelink.azconfig.io"
+  resource_group_name = azurerm_resource_group.app.name
   tags                = local.tags
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "app_config" {
+  name                  = "vnetlink-appcs-${local.workload}-${var.environment}"
+  resource_group_name   = azurerm_resource_group.app.name
+  private_dns_zone_name = azurerm_private_dns_zone.app_config.name
+  virtual_network_id    = azurerm_virtual_network.main.id
+  tags                  = local.tags
 }
 
 resource "azurerm_app_configuration_key" "infra_default" {
