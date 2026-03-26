@@ -201,13 +201,6 @@ resource "azurerm_private_dns_zone_virtual_network_link" "app_config" {
   tags                  = local.tags
 }
 
-resource "azurerm_app_configuration_key" "infra_default" {
-  configuration_store_id = azurerm_app_configuration.main.id
-  key                    = "infra_default"
-  value                  = "infra_value"
-  depends_on             = [azurerm_role_assignment.app_config_data_owner]
-}
-
 resource "azurerm_key_vault" "main" {
   name                       = "kv-${local.workload}-${var.environment}-${local.kv_suffix}"
   location                   = azurerm_resource_group.app.location
@@ -216,13 +209,6 @@ resource "azurerm_key_vault" "main" {
   sku_name                   = "standard"
   rbac_authorization_enabled = true
   tags                       = local.tags
-}
-
-resource "azurerm_key_vault_secret" "infra_default" {
-  name         = "infra-default"
-  value        = "infra_value"
-  key_vault_id = azurerm_key_vault.main.id
-  depends_on   = [azurerm_role_assignment.kv_secrets_officer]
 }
 
 resource "azurerm_key_vault_secret" "app_secret" {
