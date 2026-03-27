@@ -39,12 +39,11 @@ jobs:
           config_name=$(terraform output -raw app_config_name)
 
           az acr repository show-tags --name $acr_name --repository testapp --query "[?@=='testversion']" -o tsv | grep -q . \
-            || az acr import --name $acr_name --source ghcr.io/ali-doustkani/testapp:latest --image testapp:testversion
+            || az acr import --name $acr_name --source ghcr.io/ali-doustkani/testapp:testversion --image testapp:testversion
 
           acr_login_server=$(az acr show --name $acr_name --query loginServer -o tsv)
           az webapp config container set --name $app_name --resource-group rg-cloudforge-stg \
-            --container-image-name "$acr_login_server/testapp:testversion" \
-            --registry-use-managed-identity true
+            --container-image-name "$acr_login_server/testapp:testversion"
 
           az webapp restart --name $app_name --resource-group rg-cloudforge-stg
 
