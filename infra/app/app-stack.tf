@@ -146,6 +146,7 @@ resource "azurerm_linux_web_app" "main" {
     APP_CONFIG_ENDPOINT    = azurerm_app_configuration.main.endpoint
     KV_ENDPOINT            = azurerm_key_vault.main.vault_uri
     ASPNETCORE_ENVIRONMENT = var.environment == "stg" ? "Staging" : "Production"
+    WEBSITE_DNS_SERVER     = "168.63.129.16"
   }
 
   tags = local.tags
