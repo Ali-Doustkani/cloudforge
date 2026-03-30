@@ -126,7 +126,7 @@ resource "azurerm_storage_account" "sa" {
 
 resource "azurerm_role_assignment" "sa_contributor" {
   scope                = azurerm_storage_account.sa.id
-  role_definition_name = "Storage Blob Data Contributor"
+  role_definition_name = "Storage Table Data Contributor"
   principal_id         = azurerm_linux_web_app.main.identity[0].principal_id
 }
 
