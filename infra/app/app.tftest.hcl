@@ -12,13 +12,6 @@ override_data {
 }
 
 override_data {
-  target = data.azurerm_client_config.current
-  values = {
-    tenant_id = "00000000-0000-0000-0000-000000000000"
-  }
-}
-
-override_data {
   target = data.azurerm_container_registry.acr
   values = {
     id           = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-platform/providers/Microsoft.ContainerRegistry/registries/crplatformabcdef"
@@ -26,12 +19,13 @@ override_data {
   }
 }
 
+variables {
+  ver = "the-version"
+  environment = "stg"
+}
+
 run "resource_group" {
   command = plan
-
-  variables {
-    ver = "the-version"
-  }
 
   assert {
     condition     = azurerm_resource_group.app.tags["version"] == "the-version"
