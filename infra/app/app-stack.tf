@@ -103,7 +103,7 @@ resource "azurerm_linux_web_app" "main" {
 
   app_settings = {
     ASPNETCORE_ENVIRONMENT = var.environment == "stg" ? "Staging" : "Production"
-    STORAGE_ACCOUNT = azurerm_storage_account.sa.name
+    STORAGE_ACCOUNT = "https://${azurerm_storage_account.sa.name}.table.core.windows.net"
   }
 
   tags = local.tags
