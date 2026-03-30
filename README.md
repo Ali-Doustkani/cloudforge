@@ -58,7 +58,7 @@ terraform -chdir=infra/platform init -backend-config="storage_account_name=<stor
 terraform -chdir=infra/platform apply
 
 terraform -chdir=infra/app init -backend-config="storage_account_name=<storage_account>"
-terraform -chdir=infra/app apply -var="environment=stg" -var="ver=<git_sha>" -var="github_sp_client_id=<client_id>"
+terraform -chdir=infra/app apply -var="environment=stg" -var="ver=<git_sha>"
 ```
 
 **To integrate github with azure:**

@@ -28,7 +28,7 @@ jobs:
         with:
           working-directory: infra/app
           backend-key: app-stg.tfstate
-          plan-vars: -var="ver=${{ github.sha }}" -var="environment=stg" -var="github_sp_client_id=${{ secrets.AZURE_CLIENT_ID }}"
+          plan-vars: -var="ver=${{ github.sha }}" -var="environment=stg"
       - run: terraform apply -auto-approve tfplan
       # - name: Prepare test environment
       #   id: prepare_test_env
@@ -100,7 +100,7 @@ jobs:
         with:
           working-directory: infra/app
           backend-key: app-prod.tfstate
-          plan-vars: -var="ver=${{ github.sha }}" -var="environment=prod" -var="github_sp_client_id=${{ secrets.AZURE_CLIENT_ID }}"
+          plan-vars: -var="ver=${{ github.sha }}" -var="environment=prod"
           lint: 'false'
           test: 'false'
       - uses: actions/upload-artifact@v4

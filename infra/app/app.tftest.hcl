@@ -26,12 +26,6 @@ override_data {
   }
 }
 
-variables {
-  ver                 = "test"
-  environment         = "stg"
-  github_sp_client_id = "00000000-0000-0000-0000-000000000000"
-}
-
 run "resource_group" {
   command = plan
 

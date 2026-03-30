@@ -34,11 +34,6 @@ variable "environment" {
   }
 }
 
-variable "github_sp_client_id" {
-  type        = string
-  description = "client_id of the SP used for role assignment"
-}
-
 locals {
   workload  = "cloudforge"
   kv_suffix = substr(md5(data.azurerm_subscription.current.id), 0, 5)
@@ -49,8 +44,6 @@ locals {
     version     = var.ver
   }
 }
-
-data "azurerm_client_config" "current" {}
 
 data "azurerm_subscription" "current" {}
 
@@ -67,10 +60,6 @@ data "terraform_remote_state" "platform" {
 data "azurerm_container_registry" "acr" {
   name                = data.terraform_remote_state.platform.outputs.acr_name
   resource_group_name = data.terraform_remote_state.platform.outputs.resource_group_name
-}
-
-data "azuread_service_principal" "github" {
-  client_id = var.github_sp_client_id
 }
 
 resource "azurerm_resource_group" "app" {
