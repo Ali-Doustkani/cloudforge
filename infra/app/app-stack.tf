@@ -116,7 +116,7 @@ resource "azurerm_role_assignment" "acr_pull" {
 }
 
 resource "azurerm_storage_account" "sa" {
-  name                     = "st${local.workload}${local.suffix}${var.environment}}"
+  name                     = "st${local.workload}${local.suffix}${var.environment}"
   location                 = azurerm_resource_group.app.location
   tags                     = local.tags
   resource_group_name      = azurerm_resource_group.app.name
