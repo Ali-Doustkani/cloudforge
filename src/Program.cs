@@ -7,26 +7,11 @@ using Microsoft.FeatureManagement;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddAzureAppConfiguration(options =>
-{
-    var credential = new DefaultAzureCredential();
-    options.Connect(new Uri(builder.Configuration["APP_CONFIG_ENDPOINT"] ?? throw new InvalidOperationException("this env var is required")), credential)
-        .Select(KeyFilter.Any, labelFilter: "EN")
-        .Select(KeyFilter.Any, labelFilter: LabelFilter.Null)
-        .UseFeatureFlags(x => x.SetRefreshInterval(TimeSpan.FromSeconds(10)))
-        .ConfigureRefresh(r => r.Register("App:ConfigVersion", refreshAll: true)
-                                .SetRefreshInterval(TimeSpan.FromSeconds(10)))
-        .ConfigureKeyVault(kv => kv.SetCredential(credential));
-});
-
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAzureAppConfiguration();
-builder.Services.AddFeatureManagement().WithTargeting<TargetingContextAccessor>();
-builder.Services.AddScoped<IIncrementProvider, VariantIncrementProvider>();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
 builder.Services.AddRazorPages();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
-builder.Services.Configure<AppOption>(builder.Configuration.GetSection("App"));
 
 var app = builder.Build();
 

@@ -1,7 +1,6 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.Extensions.Options
-@inject IOptionsSnapshot<AppOption> AppOptions;
 @inject IWebHostEnvironment Environment;
 @inject AuthenticationStateProvider AuthenticationStateProvider;
 
@@ -16,9 +15,6 @@ Welcome to your new app.
 </div>
 <div>
     Version: 0.0.4
-</div>
-<div>
-    Secret: @AppOptions.Value.Secret
 </div>
 
 @code {
