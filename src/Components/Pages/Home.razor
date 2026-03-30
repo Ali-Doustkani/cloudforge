@@ -1,8 +1,11 @@
 ﻿@page "/"
+@using Azure.Storage.Blobs
+@using Azure.Storage.Blobs.Models
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.Extensions.Options
 @inject IWebHostEnvironment Environment;
 @inject AuthenticationStateProvider AuthenticationStateProvider;
+@inject IConfiguration Configuration;
 
 <PageTitle>Home</PageTitle>
 
@@ -16,6 +19,9 @@ Welcome to your new app.
 <div>
     Version: 0.0.4
 </div>
+<div>
+    Storage Account:
+</div>
 
 @code {
     private string userName = "world";
@@ -28,5 +34,8 @@ Welcome to your new app.
         {
             userName = user.Identity.Name ?? "world";
         }
+
+        // var client = new BlobServiceClient(Configuration.GetValue<string>("STORAGE_ACCOUNT"));
+        // client.GetBlobContainers()
     }
 }

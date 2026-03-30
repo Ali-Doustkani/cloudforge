@@ -35,8 +35,8 @@ variable "environment" {
 }
 
 locals {
-  workload  = "cloudforge"
-  kv_suffix = substr(md5(data.azurerm_subscription.current.id), 0, 5)
+  workload = "cloudforge"
+  suffix   = substr(md5(data.azurerm_subscription.current.id), 0, 5)
   tags = {
     workload    = local.workload
     environment = var.environment
@@ -103,6 +103,7 @@ resource "azurerm_linux_web_app" "main" {
 
   app_settings = {
     ASPNETCORE_ENVIRONMENT = var.environment == "stg" ? "Staging" : "Production"
+    STORAGE_ACCOUNT = azurerm_storage_account.sa.name
   }
 
   tags = local.tags
@@ -111,6 +112,21 @@ resource "azurerm_linux_web_app" "main" {
 resource "azurerm_role_assignment" "acr_pull" {
   scope                = data.azurerm_container_registry.acr.id
   role_definition_name = "AcrPull"
+  principal_id         = azurerm_linux_web_app.main.identity[0].principal_id
+}
+
+resource "azurerm_storage_account" "sa" {
+  name                     = "st${local.workload}${local.suffix}${var.environment}}"
+  location                 = azurerm_resource_group.app.location
+  tags                     = local.tags
+  resource_group_name      = azurerm_resource_group.app.name
+  account_tier             = "Standard"
+  account_replication_type = "LRS"
+}
+
+resource "azurerm_role_assignment" "sa_contributor" {
+  scope                = azurerm_storage_account.sa.id
+  role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azurerm_linux_web_app.main.identity[0].principal_id
 }
 
