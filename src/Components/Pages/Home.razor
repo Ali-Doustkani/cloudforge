@@ -1,4 +1,6 @@
 ﻿@page "/"
+@using Azure.Data.Tables
+@using Azure.Identity
 @using Azure.Storage.Blobs
 @using Azure.Storage.Blobs.Models
 @using Microsoft.AspNetCore.Components.Authorization
@@ -20,12 +22,13 @@ Welcome to your new app.
     Version: 0.0.4
 </div>
 <div>
-    Storage Account:
+    Storage Account: @tables
 </div>
 
 @code {
     private string userName = "world";
-
+    private string tables;
+    
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -35,7 +38,21 @@ Welcome to your new app.
             userName = user.Identity.Name ?? "world";
         }
 
-        // var client = new BlobServiceClient(Configuration.GetValue<string>("STORAGE_ACCOUNT"));
-        // client.GetBlobContainers()
+        var ep = Configuration.GetValue<string>("STORAGE_ACCOUNT");
+        if (ep == null)
+        {
+            Console.WriteLine("STORAGE_ACCOUNT not set");
+            return;
+        }
+
+        try
+        {
+            var client = new Azure.Data.Tables.TableServiceClient(new Uri(ep), new DefaultAzureCredential());
+            tables = string.Join(", ", await client.QueryAsync().Select(x => x.Name).ToArrayAsync());
+        }
+        catch(Exception ex)
+        {
+            Console.Error.WriteLine(ex);
+        }
     }
 }
