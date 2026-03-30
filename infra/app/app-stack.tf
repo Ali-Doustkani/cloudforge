@@ -113,49 +113,10 @@ resource "azurerm_linux_web_app" "main" {
   }
 
   app_settings = {
-    APP_CONFIG_ENDPOINT    = azurerm_app_configuration.main.endpoint
-    KV_ENDPOINT            = azurerm_key_vault.main.vault_uri
     ASPNETCORE_ENVIRONMENT = var.environment == "stg" ? "Staging" : "Production"
   }
 
   tags = local.tags
-}
-
-resource "azurerm_app_configuration" "main" {
-  name                = "appcs-${local.workload}-${var.environment}"
-  location            = azurerm_resource_group.app.location
-  resource_group_name = azurerm_resource_group.app.name
-  sku                 = "free"
-  tags                = local.tags
-}
-
-resource "azurerm_key_vault" "main" {
-  name                       = "kv-${local.workload}-${var.environment}-${local.kv_suffix}"
-  location                   = azurerm_resource_group.app.location
-  resource_group_name        = azurerm_resource_group.app.name
-  tenant_id                  = data.azurerm_client_config.current.tenant_id
-  sku_name                   = "standard"
-  rbac_authorization_enabled = true
-  tags                       = local.tags
-}
-
-resource "azurerm_key_vault_secret" "app_secret" {
-  name         = "app-secret"
-  value        = "hello-from-key-vault"
-  key_vault_id = azurerm_key_vault.main.id
-  depends_on   = [azurerm_role_assignment.kv_secrets_officer]
-}
-
-resource "azurerm_role_assignment" "app_config_reader" {
-  scope                = azurerm_app_configuration.main.id
-  role_definition_name = "App Configuration Data Reader"
-  principal_id         = azurerm_linux_web_app.main.identity[0].principal_id
-}
-
-resource "azurerm_role_assignment" "kv_secrets_user" {
-  scope                = azurerm_key_vault.main.id
-  role_definition_name = "Key Vault Secrets User"
-  principal_id         = azurerm_linux_web_app.main.identity[0].principal_id
 }
 
 resource "azurerm_role_assignment" "acr_pull" {
@@ -164,30 +125,10 @@ resource "azurerm_role_assignment" "acr_pull" {
   principal_id         = azurerm_linux_web_app.main.identity[0].principal_id
 }
 
-resource "azurerm_role_assignment" "kv_secrets_officer" {
-  scope                = azurerm_key_vault.main.id
-  role_definition_name = "Key Vault Secrets Officer"
-  principal_id         = data.azuread_service_principal.github.object_id
-}
-
-resource "azurerm_role_assignment" "app_config_data_owner" {
-  scope                = azurerm_app_configuration.main.id
-  role_definition_name = "App Configuration Data Owner"
-  principal_id         = data.azuread_service_principal.github.object_id
-}
-
 output "acr_name" {
   value = data.azurerm_container_registry.acr.name
 }
 
 output "app_service_name" {
   value = azurerm_linux_web_app.main.name
-}
-
-output "key_vault_name" {
-  value = azurerm_key_vault.main.name
-}
-
-output "app_config_name" {
-  value = azurerm_app_configuration.main.name
 }

@@ -81,27 +81,3 @@ run "web_app_prod_environment" {
     error_message = "ASPNETCORE_ENVIRONMENT must be 'Production' for prod environment"
   }
 }
-
-run "key_vault" {
-  command = plan
-
-  assert {
-    condition     = azurerm_key_vault.main.sku_name == "standard"
-    error_message = "Key Vault SKU must be 'standard'"
-  }
-
-  assert {
-    condition     = azurerm_key_vault.main.rbac_authorization_enabled == true
-    error_message = "Key Vault RBAC must be enabled"
-  }
-}
-
-run "app_config" {
-  command = plan
-
-  assert {
-    condition     = azurerm_app_configuration.main.sku == "standard"
-    error_message = "App Configuration SKU must be 'developer'"
-  }
-  
-}
