@@ -1,0 +1,119 @@
+@page "/storage-account"
+@using Azure.Data.Tables
+@using Azure.Identity
+@inject IConfiguration Configuration
+
+<PageTitle>Storage Account</PageTitle>
+
+<h1>Storage Account</h1>
+
+<h2>Add Entry</h2>
+<div>
+    <label>
+        Partition Key
+        <input @bind="partitionKey" />
+    </label>
+</div>
+<div>
+    <label>
+        Row Key
+        <input @bind="rowKey" />
+    </label>
+</div>
+<div>
+    <label>
+        Value
+        <input @bind="value" />
+    </label>
+</div>
+<button @onclick="AddEntry">Add</button>
+@if (addMessage != null)
+{
+    <p>@addMessage</p>
+}
+
+<h2>Read Entries</h2>
+<div>
+    <label>
+        Table Name
+        <input @bind="tableName" />
+    </label>
+</div>
+<button @onclick="ReadEntries">Read</button>
+@if (entries != null)
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Partition Key</th>
+                <th>Row Key</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var entry in entries)
+            {
+                <tr>
+                    <td>@entry.PartitionKey</td>
+                    <td>@entry.RowKey</td>
+                    <td>@(entry.TryGetValue("Value", out var v) ? v?.ToString() : "")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@if (readMessage != null)
+{
+    <p>@readMessage</p>
+}
+
+@code {
+    private string partitionKey = "";
+    private string rowKey = "";
+    private string value = "";
+    private string tableName = "";
+    private string? addMessage;
+    private string? readMessage;
+    private IList<TableEntity>? entries;
+
+    private TableClient GetTableClient(string table)
+    {
+        var ep = Configuration.GetValue<string>("STORAGE_ACCOUNT")
+            ?? throw new InvalidOperationException("STORAGE_ACCOUNT not set");
+        return new TableClient(new Uri(ep), table, new DefaultAzureCredential());
+    }
+
+    private async Task AddEntry()
+    {
+        addMessage = null;
+        try
+        {
+            var client = GetTableClient(tableName);
+            await client.CreateIfNotExistsAsync();
+            var entity = new TableEntity(partitionKey, rowKey) { ["Value"] = value };
+            await client.UpsertEntityAsync(entity);
+            addMessage = "Entry added.";
+        }
+        catch (Exception ex)
+        {
+            addMessage = $"Error: {ex.Message}";
+        }
+    }
+
+    private async Task ReadEntries()
+    {
+        readMessage = null;
+        entries = null;
+        try
+        {
+            var client = GetTableClient(tableName);
+            entries = await client.QueryAsync<TableEntity>().ToListAsync();
+            if (entries.Count == 0)
+                readMessage = "No entries found.";
+        }
+        catch (Exception ex)
+        {
+            readMessage = $"Error: {ex.Message}";
+        }
+    }
+}
