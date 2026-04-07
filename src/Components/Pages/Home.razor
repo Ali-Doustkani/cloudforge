@@ -8,6 +8,7 @@
 @inject IWebHostEnvironment Environment;
 @inject AuthenticationStateProvider AuthenticationStateProvider;
 @inject IConfiguration Configuration;
+@inject ILogger<Home> logger;
 
 <PageTitle>Home</PageTitle>
 
@@ -31,8 +32,7 @@ Welcome to your new app.
     
     protected override async Task OnInitializedAsync()
     {
-        Console.Out.WriteLine("Test stdout");
-        Console.Error.WriteLine("Test stderr");
+        logger.LogInformation("Home page loading...");
         
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
