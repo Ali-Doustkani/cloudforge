@@ -31,6 +31,9 @@ Welcome to your new app.
     
     protected override async Task OnInitializedAsync()
     {
+        Console.Out.WriteLine("Test stdout");
+        Console.Error.WriteLine("Test stderr");
+        
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         if (user.Identity?.IsAuthenticated == true)
