@@ -102,8 +102,9 @@ resource "azurerm_linux_web_app" "main" {
   }
 
   app_settings = {
-    ASPNETCORE_ENVIRONMENT = var.environment == "stg" ? "Staging" : "Production"
-    STORAGE_ACCOUNT = "https://${azurerm_storage_account.sa.name}.table.core.windows.net"
+    ASPNETCORE_ENVIRONMENT                = var.environment == "stg" ? "Staging" : "Production"
+    STORAGE_ACCOUNT                       = "https://${azurerm_storage_account.sa.name}.table.core.windows.net"
+    APPLICATIONINSIGHTS_CONNECTION_STRING = azurerm_application_insights.appinsights.connection_string
   }
 
   tags = local.tags
@@ -122,6 +123,15 @@ resource "azurerm_storage_account" "sa" {
   resource_group_name      = azurerm_resource_group.app.name
   account_tier             = "Standard"
   account_replication_type = "LRS"
+}
+
+resource "azurerm_application_insights" "appinsights" {
+  name                = "appi-${local.workload}-${var.environment}"
+  location            = azurerm_resource_group.app.location
+  resource_group_name = azurerm_resource_group.app.name
+  tags                = local.tags
+  application_type    = "web"
+  workspace_id        = data.terraform_remote_state.platform.outputs.law_id
 }
 
 resource "azurerm_role_assignment" "sa_contributor" {

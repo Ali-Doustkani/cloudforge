@@ -50,10 +50,23 @@ resource "azurerm_container_registry" "acr" {
   tags                = local.tags
 }
 
+resource "azurerm_log_analytics_workspace" "log_platform" {
+  name                = "log-platform"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+  tags                = local.tags
+}
+
 output "acr_name" {
   value = azurerm_container_registry.acr.name
 }
 
 output "resource_group_name" {
   value = azurerm_resource_group.main.name
+}
+
+output "law_id" {
+  value = azurerm_log_analytics_workspace.log_platform.id
 }
