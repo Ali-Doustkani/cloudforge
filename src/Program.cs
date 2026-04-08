@@ -1,3 +1,4 @@
+using app.Api;
 using app.Components;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -30,5 +31,7 @@ app.MapRazorPages();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+app.MapOrderEndpoints();
 
 app.Run();
