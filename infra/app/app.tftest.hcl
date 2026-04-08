@@ -7,6 +7,7 @@ override_data {
     outputs = {
       acr_name            = "crplatformabcdef"
       resource_group_name = "rg-platform"
+      law_id              = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-platform/providers/Microsoft.OperationalInsights/workspaces/log-platform"
     }
   }
 }
@@ -20,7 +21,7 @@ override_data {
 }
 
 variables {
-  ver = "the-version"
+  ver         = "the-version"
   environment = "stg"
 }
 
