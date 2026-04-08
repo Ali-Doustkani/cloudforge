@@ -30,6 +30,10 @@ static class OrderEndpoints
     private static Order[] GetOrders(ActivitySource source)
     {
         using var activity1 = source.StartActivity("GetOrders");
+        activity1?.SetTag("mode", "get_all");
+        activity1?.AddEvent(new  ActivityEvent("cache miss, falling back"));
+        Thread.Sleep(500);
+        
         using var activity2 = source.StartActivity("ProcessOrders");
         return Orders.ToArray();
     }
