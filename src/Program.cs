@@ -5,7 +5,11 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenTelemetry().UseAzureMonitor();
+if (!string.IsNullOrEmpty(builder.Configuration.GetValue<string>("APPLICATIONINSIGHTS_CONNECTION_STRING")))
+{
+    builder.Services.AddOpenTelemetry().UseAzureMonitor();
+}
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
 builder.Services.AddRazorPages();
