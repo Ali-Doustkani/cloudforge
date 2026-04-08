@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace app.Api;
 
 record Order(int Id, string Item, int Quantity);
@@ -25,8 +27,10 @@ static class OrderEndpoints
             return Results.Created($"/order/{order.Id}", order);
     }
 
-    private static Order[] GetOrders()
+    private static Order[] GetOrders(ActivitySource source)
     {
+        using var activity1 = source.StartActivity("GetOrders");
+        using var activity2 = source.StartActivity("ProcessOrders");
         return Orders.ToArray();
     }
 }

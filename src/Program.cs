@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using app.Api;
 using app.Components;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
@@ -10,6 +11,7 @@ if (!string.IsNullOrEmpty(builder.Configuration.GetValue<string>("APPLICATIONINS
     builder.Services.AddOpenTelemetry().UseAzureMonitor();
 }
 
+builder.Services.AddSingleton(new ActivitySource("cloudforge.orders"));
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
 builder.Services.AddRazorPages();
