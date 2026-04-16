@@ -25,6 +25,9 @@ Welcome to your new app.
     Version: 0.0.5
 </div>
 <div>
+    Instance: @instanceId
+</div>
+<div>
     Storage Account: @tables
 </div>
 <div>
@@ -37,6 +40,7 @@ Welcome to your new app.
     private string userName = "world";
     private string tables;
     private bool isHealthy = HealthState.IsHealthy;
+    private string instanceId = System.Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID") ?? "local";
     
     protected override async Task OnInitializedAsync()
     {
