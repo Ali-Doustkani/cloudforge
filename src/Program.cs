@@ -34,10 +34,16 @@ app.UseAntiforgery();
 
 app.MapRazorPages();
 
+app.MapGet("/health", () => HealthState.IsHealthy
+    ? Results.Ok(new { status = "healthy" })
+    : Results.Json(new { status = "unhealthy" }, statusCode: 500))
+    .DisableAntiforgery();
+
+app.MapOrderEndpoints();
+
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
-app.MapOrderEndpoints();
 
 app.Run();

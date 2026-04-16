@@ -1,4 +1,6 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@using app.Api
 @using Azure.Data.Tables
 @using Azure.Identity
 @using Azure.Storage.Blobs
@@ -25,10 +27,16 @@ Welcome to your new app.
 <div>
     Storage Account: @tables
 </div>
+<div>
+    Health: @(isHealthy ? "Healthy" : "Unhealthy")
+    <button @onclick="ToggleHealth">Simulate @(isHealthy ? "Unhealthy" : "Healthy")</button>
+
+</div>
 
 @code {
     private string userName = "world";
     private string tables;
+    private bool isHealthy = HealthState.IsHealthy;
     
     protected override async Task OnInitializedAsync()
     {
@@ -57,5 +65,11 @@ Welcome to your new app.
         {
             Console.Error.WriteLine(ex);
         }
+    }
+
+    private void ToggleHealth()
+    {
+        HealthState.IsHealthy = !HealthState.IsHealthy;
+        isHealthy = HealthState.IsHealthy;
     }
 }
