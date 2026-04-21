@@ -1,0 +1,8 @@
+@page "/admin"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = "Admin")]
+@rendermode InteractiveServer
+
+<PageTitle>Admin</PageTitle>
+<h1>Admin Panel</h1>
+<p>This page is only visible to admins.</p>

@@ -1,8 +1,10 @@
 using System.Diagnostics;
+using System.Security.Claims;
+using System.Text.Json;
 using app.Api;
 using app.Components;
 using Azure.Monitor.OpenTelemetry.AspNetCore;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using app;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +15,6 @@ if (!string.IsNullOrEmpty(builder.Configuration.GetValue<string>("APPLICATIONINS
 
 builder.Services.AddSingleton(new ActivitySource("cloudforge.orders"));
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
 builder.Services.AddRazorPages();
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
 
@@ -29,7 +30,20 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication();
+app.Use(async (context, next) =>
+{
+    var header = context.Request.Headers["X-MS-CLIENT-PRINCIPAL"].FirstOrDefault();
+    if (header != null)
+    {
+        var decoded = Convert.FromBase64String(header);
+        var json = JsonSerializer.Deserialize<EasyAuthPrincipal>(decoded);
+        var claims = json.Claims.Select(x=>new Claim(x.Type, x.Value)).ToList();
+        var identity = new ClaimsIdentity(claims, "easyauth");
+        context.User = new ClaimsPrincipal(identity);
+    }
+    await next();
+});
+app.UseAuthorization();
 app.UseAntiforgery();
 
 app.MapRazorPages();

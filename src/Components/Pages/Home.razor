@@ -34,6 +34,15 @@ Welcome to your new app.
     Health: @(isHealthy ? "Healthy" : "Unhealthy")
     <button @onclick="ToggleHealth">Simulate @(isHealthy ? "Unhealthy" : "Healthy")</button>
 
+    @if (!isAuthenticated)
+    {
+        <a href="/.auth/login/aad?post_login_redirect_uri=/">Login</a>
+    }
+    else
+    {
+        <p>welcome @userName!</p>
+        <a href="/.auth/logout">Logout</a>
+    }
 </div>
 
 @code {
@@ -41,13 +50,16 @@ Welcome to your new app.
     private string tables;
     private bool isHealthy = HealthState.IsHealthy;
     private string instanceId = System.Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID") ?? "local";
+    private bool isAuthenticated;
     
     protected override async Task OnInitializedAsync()
     {
-        logger.LogInformation("Home page loading...");
-        
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
+        isAuthenticated = user.Identity?.IsAuthenticated == true;
+        
+        logger.LogInformation("Home page loading...");
+        
         if (user.Identity?.IsAuthenticated == true)
         {
             userName = user.Identity.Name ?? "world";
