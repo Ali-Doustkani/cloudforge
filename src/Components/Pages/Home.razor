@@ -41,6 +41,7 @@ Welcome to your new app.
     else
     {
         <p>welcome @userName!</p>
+        <p>@roles</p>
         <a href="/.auth/logout">Logout</a>
     }
 </div>
@@ -51,6 +52,7 @@ Welcome to your new app.
     private bool isHealthy = HealthState.IsHealthy;
     private string instanceId = System.Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID") ?? "local";
     private bool isAuthenticated;
+    private string roles;
     
     protected override async Task OnInitializedAsync()
     {
@@ -63,6 +65,7 @@ Welcome to your new app.
         if (user.Identity?.IsAuthenticated == true)
         {
             userName = user.Identity.Name ?? "world";
+            roles = string.Join(", ", user.Claims.Select(x => $"{x.Type}: {x.Value}"));
         }
 
         var ep = Configuration.GetValue<string>("STORAGE_ACCOUNT");
