@@ -1,0 +1,7 @@
+{
+  "updated": "2026-05-06T00:00:00Z",
+  "services": [
+    { "name": "CloudForge App", "status": "healthy", "last_checked": "2026-05-06T00:00:00Z" },
+    { "name": "CloudForge API", "status": "healthy", "last_checked": "2026-05-06T00:00:00Z" }
+  ]
+}
