@@ -7,6 +7,7 @@ on:
       - main
     paths:
       - 'dashboard/**'
+      - '.github/workflows/deploy-dashboard.yml'
     
 jobs:
   deploy:
