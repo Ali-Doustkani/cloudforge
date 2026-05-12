@@ -15,5 +15,8 @@
       "redirect": "/not-found",
       "statusCode": 302
     }
+  }, 
+  "globalHeaders": {
+    "X-Content-Type-Options": "nosniff"
   }
 }
