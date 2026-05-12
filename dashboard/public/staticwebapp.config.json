@@ -17,6 +17,7 @@
     }
   }, 
   "globalHeaders": {
-    "X-Content-Type-Options": "nosniff"
+    "X-Content-Type-Options": "nosniff",
+    "X-My-Custom": "header"
   }
 }
