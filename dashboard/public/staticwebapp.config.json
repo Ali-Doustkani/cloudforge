@@ -15,11 +15,5 @@
       "redirect": "/not-found",
       "statusCode": 302
     }
-  },
-  "routes": [
-    {
-      "route": "/not-found",
-      "statusCode": 404
-    }
-  ]
+  }
 }
