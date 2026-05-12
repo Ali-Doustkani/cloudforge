@@ -1,7 +1,10 @@
 {
   "navigationFallback": {
     "rewrite": "/index.html",
-    "exclude": ["/assets/*", "/*.{css,js,png,svg,ico}"]
+    "exclude": [
+      "/assets/*",
+      "/*.{css,js,png,svg,ico}"
+    ]
   },
   "responseOverrides": {
     "401": {
@@ -12,5 +15,11 @@
       "redirect": "/not-found",
       "statusCode": 302
     }
-  }
+  },
+  "routes": [
+    {
+      "route": "/not-found",
+      "statusCode": 404
+    }
+  ]
 }
