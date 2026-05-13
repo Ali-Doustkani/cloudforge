@@ -20,19 +20,6 @@ jobs:
         with:
           submodules: true
           lfs: false
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      - name: get swa token
-        run: |
-          TOKEN=$(az staticwebapp secrets list --name stapp-cloudforge -g rg-cloudforge --query "properties.apiKey" -o tsv)
-          echo "Token length: ${#TOKEN}"
-          echo "first: ${TOKEN:0:10}"
-          echo "SWA_TOKEN=$TOKEN" >> $GITHUB_ENV
-          
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
