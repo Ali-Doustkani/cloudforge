@@ -31,7 +31,7 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       - name: get swa token
         run: |
-          TOKEN=$(az staticwebapp secrets list --name stapp-cloudforge -g rg-cloudforge --query "properties.apikey" -o tsv)
+          TOKEN=$(az staticwebapp secrets list --name stapp-cloudforge -g rg-cloudforge --query "properties.apiKey" -o tsv)
           echo "SWA_TOKEN=$TOKEN" >> $GITHUB_ENV
           
       - name: Build And Deploy
