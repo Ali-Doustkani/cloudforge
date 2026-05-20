@@ -2,7 +2,7 @@
   "routes": [
     {
       "route": "/instances*",
-      "allowedRoles": ["administrator"]
+      "allowedRoles": ["authenticated"]
     }
   ],
   "navigationFallback": {
